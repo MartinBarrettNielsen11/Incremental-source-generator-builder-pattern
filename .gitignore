@@ -1,0 +1,20 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# JetBrains Rider / IntelliJ
+.idea/
+**/.idea/
+
+# .NET build output
+bin/
+obj/
+**/bin/
+**/obj/
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Rider-specific
+*.sln.iml

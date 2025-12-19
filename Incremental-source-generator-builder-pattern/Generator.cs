@@ -1,4 +1,6 @@
+using System.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Incremental_source_generator_builder_pattern;
 
@@ -13,6 +15,11 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        throw new NotImplementedException();
+        context.RegisterPostInitializationOutput(static context =>
+        {
+            context.AddSource(
+                $"{Constants.BuilderAttributeName}.g.cs", 
+                SourceText.From(string.Empty, Encoding.UTF8));
+        });    
     }
 }

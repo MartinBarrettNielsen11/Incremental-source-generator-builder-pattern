@@ -1,0 +1,16 @@
+namespace Incremental_source_generator_builder_pattern;
+
+internal static class Constants
+{
+    /// <summary>
+    /// The name used in the GeneratedCode attribute.
+    /// </summary>
+    internal const string GeneratorName = "BimServices.BuilderGenerator";
+
+    /// <summary>
+    /// The version number embedded in generated files.
+    /// </summary>
+    internal const string GeneratorVersion = "v1";
+    
+    internal const string BuilderAttributeName = "BuilderAttribute";
+}

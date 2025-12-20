@@ -1,4 +1,5 @@
 using System.Text;
+using Incremental_source_generator_builder_pattern.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
@@ -19,7 +20,7 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
         {
             context.AddSource(
                 $"{Constants.BuilderAttributeName}.g.cs", 
-                SourceText.From(string.Empty, Encoding.UTF8));
+                SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
         });    
     }
 }

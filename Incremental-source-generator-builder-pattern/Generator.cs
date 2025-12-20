@@ -1,4 +1,5 @@
 using System.Text;
+using Incremental_source_generator_builder_pattern.Contracts;
 using Incremental_source_generator_builder_pattern.Helpers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -21,6 +22,21 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             context.AddSource(
                 $"{Constants.BuilderAttributeName}.g.cs", 
                 SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
-        });    
+        });
+        IncrementalValuesProvider<BuilderToGenerate> res = context.SyntaxProvider.ForAttributeWithMetadataName(
+            $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",
+            predicate: static (_, _) => true,
+            transform: static (generatorAttributeSyntaxContext, ct) =>
+                Transform(generatorAttributeSyntaxContext, ct));
+    }
+
+    private static BuilderToGenerate Transform(GeneratorAttributeSyntaxContext sc, CancellationToken ct)
+    {
+        return new BuilderToGenerate(
+            BuilderClassName: "test",
+            BuilderClassNamespace: "test",
+            Properties: new  Properties(),
+            TargetClassFullName: "test",
+            ElapsedTime: TimeSpan.FromDays(0));
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 using Incremental_source_generator_builder_pattern.Contracts;
 using Incremental_source_generator_builder_pattern.Helpers;
@@ -24,10 +25,12 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
                 SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
         });
         IncrementalValuesProvider<BuilderToGenerate> res = context.SyntaxProvider.ForAttributeWithMetadataName(
-            $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",
-            predicate: static (_, _) => true,
-            transform: static (generatorAttributeSyntaxContext, ct) =>
-                Transform(generatorAttributeSyntaxContext, ct));
+                $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",
+                predicate: static (_, _) => true,
+                transform: static (generatorAttributeSyntaxContext, ct) =>
+                    Transform(generatorAttributeSyntaxContext, ct))
+            .Where(static b => b is not null)
+            .Select(static (b, _) => b!.Value);
 
         context.RegisterSourceOutput(res, static (sourceProductionContext, builder) =>
         {
@@ -54,13 +57,30 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
         });
     }
 
-    private static BuilderToGenerate Transform(GeneratorAttributeSyntaxContext sc, CancellationToken ct)
+    private static BuilderToGenerate? Transform(GeneratorAttributeSyntaxContext sc, CancellationToken ct)
     {
+        var stopWatch = Stopwatch.StartNew();
+        
+        if (sc.TargetSymbol is not INamedTypeSymbol builderSymbol)
+            return null;
+
+        // Get the target type from the attribute [BuilderFor(typeof(Entity))]
+        AttributeData? attribute = sc.Attributes.FirstOrDefault();
+        
+        if (attribute?.ConstructorArguments.Length is not > 0)
+            return null;
+
+        if (attribute.ConstructorArguments[0].Value is not INamedTypeSymbol targetType)
+            return null;
+
+        // short-circuit the transformation if additional changes are detected
+        ct.ThrowIfCancellationRequested();
+        
         return new BuilderToGenerate(
             BuilderClassName: "test",
             BuilderClassNamespace: "test",
             Properties: new  Properties(),
             TargetClassFullName: "test",
-            ElapsedTime: TimeSpan.FromDays(0));
+            ElapsedTime: stopWatch.Elapsed);
     }
 }

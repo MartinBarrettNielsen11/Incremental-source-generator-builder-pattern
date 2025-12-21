@@ -43,7 +43,13 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             }
             catch (Exception e)
             {
-
+                sourceProductionContext.ReportDiagnostic(
+                    Diagnostic.Create(
+                        new DiagnosticDescriptor(
+                            "BGN001",
+                            "Unexpected error", 
+                            $"An error occurred while generating a builder for '{builder.TargetClassFullName}'\n{e.Message}", 
+                            "BuilderGenerator", DiagnosticSeverity.Error, true), null));   
             }
         });
     }

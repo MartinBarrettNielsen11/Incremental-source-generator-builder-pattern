@@ -28,6 +28,24 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             predicate: static (_, _) => true,
             transform: static (generatorAttributeSyntaxContext, ct) =>
                 Transform(generatorAttributeSyntaxContext, ct));
+
+        context.RegisterSourceOutput(res, static (sourceProductionContext, builder) =>
+        {
+            try
+            {
+                var generatedOutput = BuilderSourceEmitter.GenerateBuilder(builder);
+
+                // move extensions addition down here - and make tests for it
+                sourceProductionContext.AddSource(
+                    $"{builder.BuilderClassNamespace.Replace(".", "_")}_{builder.BuilderClassName}.cs",
+                    SourceText.From(generatedOutput, Encoding.UTF8)
+                );
+            }
+            catch (Exception e)
+            {
+
+            }
+        });
     }
 
     private static BuilderToGenerate Transform(GeneratorAttributeSyntaxContext sc, CancellationToken ct)

@@ -13,4 +13,8 @@ internal static class Constants
     internal const string GeneratorVersion = "v1";
     
     internal const string BuilderAttributeName = "BuilderAttribute";
+    
+    internal const string DomainAssertionExtensions = "DomainAssertionExtensions";
+    
+    internal const string DomainListName = "_domainRules";
 }

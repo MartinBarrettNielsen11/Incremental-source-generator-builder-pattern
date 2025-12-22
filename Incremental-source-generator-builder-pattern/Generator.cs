@@ -23,6 +23,11 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             context.AddSource(
                 $"{Constants.BuilderAttributeName}.g.cs", 
                 SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
+            
+            context.AddSource(
+                $"{Constants.DomainAssertionExtensions}.g.cs", 
+                SourceText.From(BuilderSourceEmitter.GenerateDomainAssertionExtensions(typeof(BuilderGenerator).Namespace!), Encoding.UTF8));
+
         });
         IncrementalValuesProvider<BuilderToGenerate> res = context.SyntaxProvider.ForAttributeWithMetadataName(
                 $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",

@@ -6,6 +6,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52D5A59E-52C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6E25E408-5092-4B31-921F-531BD2F05244}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BimServices.BuilderGenerator.Tests", "BimServices.BuilderGenerator.Tests\BimServices.BuilderGenerator.Tests.csproj", "{3D2D9CF4-F705-477C-8C0A-E42763859F8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,8 +18,13 @@ Global
 		{3E2CD539-362A-4079-A87E-A2B86693CFC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E2CD539-362A-4079-A87E-A2B86693CFC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E2CD539-362A-4079-A87E-A2B86693CFC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D2D9CF4-F705-477C-8C0A-E42763859F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D2D9CF4-F705-477C-8C0A-E42763859F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D2D9CF4-F705-477C-8C0A-E42763859F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D2D9CF4-F705-477C-8C0A-E42763859F8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3E2CD539-362A-4079-A87E-A2B86693CFC2} = {52D5A59E-52C9-45A1-A83D-ED66DD077E8C}
+		{3D2D9CF4-F705-477C-8C0A-E42763859F8D} = {6E25E408-5092-4B31-921F-531BD2F05244}
 	EndGlobalSection
 EndGlobal

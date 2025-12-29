@@ -29,11 +29,12 @@ public class Helpers
             new List<PropertyInfoModel>(collection));
     }
     
-    private static void CollectSymbols(ITypeSymbol type, List<IPropertySymbol>? collection, List<IPropertySymbol>? normal)
+    private static void CollectSymbols(ITypeSymbol type, INamedTypeSymbol typeICollection, List<IPropertySymbol>? collection, List<IPropertySymbol>? normal)
     {
         foreach (var property in type.GetMembers().OfType<IPropertySymbol>())
         {
-            bool isCollection = property.SetMethod;
+            bool isCollection = property.SetMethod is null &&
+                                ImplementsInterface(property.Type, typeICollection);
             if (isCollection)
                 collection.Add(property);
             else if (property.SetMethod is not null && property.SetMethod.DeclaredAccessibility == Accessibility.Public)
@@ -41,6 +42,12 @@ public class Helpers
         }
 
         if (type.BaseType is { } baseType)
-            CollectSymbols(baseType, collection, normal);
+            CollectSymbols(baseType, typeICollection, collection, normal);
+    }
+
+    private static bool ImplementsInterface(ITypeSymbol candidate, ISymbol targetType)
+    {
+        return candidate.AllInterfaces.Any(i =>
+            SymbolEqualityComparer.Default.Equals(i.ConstructedFrom, targetType));
     }
 }

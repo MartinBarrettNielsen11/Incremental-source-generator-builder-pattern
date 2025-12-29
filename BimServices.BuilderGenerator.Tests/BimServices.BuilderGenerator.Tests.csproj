@@ -9,7 +9,7 @@
 </PropertyGroup>
 
 <ItemGroup>
-    <ProjectReference Include="..\BimServices.BuilderGenerator\BimServices.BuilderGenerator.csproj"/>
+    <ProjectReference Include="..\Incremental-source-generator-builder-pattern\Incremental-source-generator-builder-pattern.csproj"/>
 </ItemGroup>
 
 <ItemGroup>

@@ -81,6 +81,12 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
         // short-circuit the transformation if additional changes are detected
         ct.ThrowIfCancellationRequested();
         
+        INamedTypeSymbol? typeICollection = sc.SemanticModel.Compilation
+            .GetTypeByMetadataName(typeof(ICollection<>).FullName!);
+
+        Properties properties = Helpers.GetPropertySymbols(typeICollection!, targetType);
+
+        
         return new BuilderToGenerate(
             BuilderClassName: "test",
             BuilderClassNamespace: "test",

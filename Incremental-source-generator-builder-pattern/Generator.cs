@@ -80,13 +80,12 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             .GetTypeByMetadataName(typeof(ICollection<>).FullName!);
 
         Properties properties = Helpers.GetPropertySymbols(typeICollection!, targetType);
-
         
         return new BuilderToGenerate(
-            BuilderClassName: "test",
-            BuilderClassNamespace: "test",
-            Properties: new  Properties(),
-            TargetClassFullName: "test",
+            BuilderClassName: builderSymbol.Name,
+            BuilderClassNamespace: builderSymbol.ContainingNamespace.ToString(),
+            Properties: properties,
+            TargetClassFullName: targetType.ToString(),
             ElapsedTime: stopWatch.Elapsed);
     }
 }

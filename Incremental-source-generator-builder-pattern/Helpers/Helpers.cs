@@ -3,7 +3,8 @@ using Microsoft.CodeAnalysis;
 
 namespace Incremental_source_generator_builder_pattern.Helpers;
 
-public class Helpers
+
+internal static class Helpers
 {
     internal static Properties GetPropertySymbols(
         INamedTypeSymbol typeICollection,
@@ -29,6 +30,7 @@ public class Helpers
             new List<PropertyInfoModel>(collection));
     }
     
+
     private static void CollectSymbols(ITypeSymbol type, INamedTypeSymbol typeICollection, List<IPropertySymbol>? collection, List<IPropertySymbol>? normal)
     {
         foreach (var property in type.GetMembers().OfType<IPropertySymbol>())
@@ -50,4 +52,14 @@ public class Helpers
         return candidate.AllInterfaces.Any(i =>
             SymbolEqualityComparer.Default.Equals(i.ConstructedFrom, targetType));
     }
+    
+        
+    private static PropertyInfoModel ToModel(IPropertySymbol property, bool isCollection) =>
+        new(
+            Name: property.Name,
+            TypeName: property.Type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat),
+            IsCollection: isCollection,
+            HasSetter: property.SetMethod is not null,
+            Accessibility: property.DeclaredAccessibility
+        );
 }

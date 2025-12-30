@@ -19,4 +19,6 @@ internal static class Constants
     internal const string DomainListName = "_domainRules";
     
     internal const string FactoryName = "_factory";
+    
+    internal const string WithMethodPrefix = "With";
 }

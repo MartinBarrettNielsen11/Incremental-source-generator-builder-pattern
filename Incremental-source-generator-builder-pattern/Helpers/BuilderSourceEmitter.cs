@@ -63,6 +63,7 @@ internal static class BuilderSourceEmitter
 
         AppendHeader(sb, builder);
         AppendFields(sb, builder);
+        AppendWithMethods(sb, builder);
         // Add remainder
 
         return sb.ToString();
@@ -104,4 +105,22 @@ internal static class BuilderSourceEmitter
         sb.Append("\n");
     }
     
+    private static void AppendWithMethods(StringBuilder sb, BuilderToGenerate builder)
+    {
+        foreach (var prop in builder.Properties.AllProperties)
+        {
+            var type = prop.TypeName;
+            var name = prop.Name;
+            var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
+            
+            sb.Append($"    public {builder.BuilderClassName} {Constants.WithMethodPrefix}{name}({type} @{camelCase})\n");
+            sb.Append("    {\n");
+            sb.Append($"        return {Constants.WithMethodPrefix}{name}(() => @{camelCase});\n");
+            sb.Append("    }\n");
+            sb.Append($"    public {builder.BuilderClassName} {Constants.WithMethodPrefix}{name}(Func<{type}> @{camelCase})\n");
+            sb.Append("    {\n");
+            sb.Append($"        _{camelCase} = @{camelCase};\n");
+            sb.Append("        return this;\n    }\n\n");
+        }
+    }
 }

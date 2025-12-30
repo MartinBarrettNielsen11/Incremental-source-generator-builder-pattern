@@ -1,8 +1,3 @@
-using System.Diagnostics;
-using System.Text;
-using Incremental_source_generator_builder_pattern.Contracts;
-using Incremental_source_generator_builder_pattern.Helpers;
-using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Incremental_source_generator_builder_pattern;

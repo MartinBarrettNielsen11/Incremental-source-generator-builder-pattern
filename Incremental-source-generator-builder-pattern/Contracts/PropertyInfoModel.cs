@@ -1,6 +1,4 @@
-using Microsoft.CodeAnalysis;
-
-namespace Incremental_source_generator_builder_pattern.Contracts;
+namespace Incremental_source_generator_builder_pattern;
 
 /// <summary>
 /// Immutable, value-equatable subset of IPropertySymbol data.

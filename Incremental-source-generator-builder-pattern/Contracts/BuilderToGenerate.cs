@@ -1,4 +1,4 @@
-namespace Incremental_source_generator_builder_pattern.Contracts;
+namespace Incremental_source_generator_builder_pattern;
 
 /// <summary>
 ///Helper struct for transferring data to the builder.

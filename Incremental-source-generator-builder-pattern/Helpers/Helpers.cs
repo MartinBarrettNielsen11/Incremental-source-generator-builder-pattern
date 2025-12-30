@@ -1,8 +1,4 @@
-using Incremental_source_generator_builder_pattern.Contracts;
-using Microsoft.CodeAnalysis;
-
-namespace Incremental_source_generator_builder_pattern.Helpers;
-
+namespace Incremental_source_generator_builder_pattern;
 
 internal static class Helpers
 {

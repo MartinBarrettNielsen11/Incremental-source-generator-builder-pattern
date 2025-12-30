@@ -1,9 +1,6 @@
-using System.Text;
-using Incremental_source_generator_builder_pattern.Contracts;
+namespace Incremental_source_generator_builder_pattern;
 
-namespace Incremental_source_generator_builder_pattern.Helpers;
-
-internal sealed class BuilderSourceEmitter
+internal static class BuilderSourceEmitter
 {
     internal static string GenerateBuilderAttribute(string builderAttributeName)
     {

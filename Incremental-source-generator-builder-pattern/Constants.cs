@@ -17,4 +17,6 @@ internal static class Constants
     internal const string DomainAssertionExtensions = "DomainAssertionExtensions";
     
     internal const string DomainListName = "_domainRules";
+    
+    internal const string FactoryName = "_factory";
 }

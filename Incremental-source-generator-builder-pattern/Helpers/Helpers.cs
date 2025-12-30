@@ -22,8 +22,8 @@ internal static class Helpers
             .ToArray();
         
         return new Properties(
-            new List<PropertyInfoModel>(normal),
-            new List<PropertyInfoModel>(collection));
+            new EquatableArray<PropertyInfoModel>(normal),
+            new EquatableArray<PropertyInfoModel>(collection));
     }
     
 

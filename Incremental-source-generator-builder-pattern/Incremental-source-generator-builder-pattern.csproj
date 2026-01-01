@@ -17,4 +17,17 @@
         </PackageReference>
     </ItemGroup>
     
+    <ItemGroup>
+        <InternalsVisibleTo Include="BimServices.BuilderGenerator.Tests" />
+    </ItemGroup>
+
+    <Target Name="AddInternalsVisibleTo" BeforeTargets="CoreCompile">
+        <ItemGroup>
+            <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute"
+                               Condition="@(InternalsVisibleTo) != ''">
+                <_Parameter1>@(InternalsVisibleTo)</_Parameter1>
+            </AssemblyAttribute>
+        </ItemGroup>
+    </Target>
+    
 </Project>

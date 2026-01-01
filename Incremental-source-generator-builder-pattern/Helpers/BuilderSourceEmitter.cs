@@ -17,8 +17,7 @@ internal static class BuilderSourceEmitter
         vsb.Append("}\n");
         vsb.Append("#pragma warning restore CA1813, CA1019, IDE0065, IDE0034, IDE0055\n");
 
-        var yo = vsb.ToString();
-        return yo;
+        return vsb.ToString();
     }
     
     
@@ -64,6 +63,7 @@ internal static class BuilderSourceEmitter
         AppendHeader(sb, builder);
         AppendFields(sb, builder);
         AppendWithMethods(sb, builder);
+        AppendBuildMethod(sb, builder);
         // Add remainder
 
         return sb.ToString();
@@ -122,5 +122,34 @@ internal static class BuilderSourceEmitter
             sb.Append($"        _{camelCase} = @{camelCase};\n");
             sb.Append("        return this;\n    }\n\n");
         }
+    }
+    
+    private static void AppendBuildMethod(StringBuilder sb, BuilderToGenerate builder)
+    { 
+        sb.Append($"    /// <summary> Returns configured of instance of the {builder.TargetClassFullName} entity </summary>\n");
+        sb.Append($"    public {builder.TargetClassFullName} Build()\n");
+        sb.Append("    {\n");
+        sb.Append($"        {builder.TargetClassFullName} instance = {Constants.FactoryName}();\n\n");
+
+        foreach (var prop in builder.Properties.Normal)
+        {
+            var name = prop.Name;
+            var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
+
+            sb.Append($"        if(_{camelCase} is not null)\n");
+            sb.Append($"            instance.{name} = _{camelCase}.Invoke();\n\n");
+        }
+
+        foreach (var prop in builder.Properties.Collection)
+        {
+            var name = prop.Name;
+            var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
+            sb.Append($"        _{camelCase}?.Invoke()?\n");
+            sb.Append("        .ToList()\n");
+            sb.Append($"        .ForEach(item => instance.{name}.Add(item));\n\n");
+        }
+
+        sb.Append($"        {Constants.DomainListName}.ForEach(action => action(instance));\n\n");
+        sb.Append("        return instance;\n}");
     }
 }

@@ -27,4 +27,9 @@
     <Compile Remove="TestData\Test3.cs" />
 </ItemGroup>
 
+
+<ItemGroup>
+  <Folder Include="Snapshots\" />
+</ItemGroup>
+
 </Project>

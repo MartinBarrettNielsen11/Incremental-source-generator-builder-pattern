@@ -2,11 +2,11 @@ using Microsoft.CodeAnalysis;
 
 namespace BimServices.BuilderGenerator.Tests;
 
-internal class FunctionalTests
+public class FunctionalTests
 {
     private static readonly string Example1 = $"{typeof(FunctionalTests).Namespace}.TestData.Test1.cs";
 
-    private VerifySettings _settings = new();
+    private readonly VerifySettings _settings = new();
 
     [Test]
     public async Task BuilderAttributeUsage_IsGenerated()

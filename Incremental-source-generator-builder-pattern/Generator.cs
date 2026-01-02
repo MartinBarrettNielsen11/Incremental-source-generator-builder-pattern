@@ -29,8 +29,10 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
                 predicate: static (_, _) => true,
                 transform: static (generatorAttributeSyntaxContext, ct) =>
                     Transform(generatorAttributeSyntaxContext, ct))
+            .WithTrackingName(TrackingNames.InitialExtraction)
             .Where(static b => b is not null)
-            .Select(static (b, _) => b!.Value);
+            .Select(static (b, _) => b!.Value)
+            .WithTrackingName(TrackingNames.RemovingNulls);
 
         context.RegisterSourceOutput(res, static (sourceProductionContext, builder) =>
         {

@@ -64,7 +64,7 @@ internal static class BuilderSourceEmitter
         AppendFields(sb, builder);
         AppendWithMethods(sb, builder);
         AppendBuildMethod(sb, builder);
-        // Add remainder
+        AppendFooter(sb);
 
         return sb.ToString();
     }
@@ -152,4 +152,6 @@ internal static class BuilderSourceEmitter
         sb.Append($"        {Constants.DomainListName}.ForEach(action => action(instance));\n\n");
         sb.Append("        return instance;\n}");
     }
+    
+    private static void AppendFooter(StringBuilder sb) => sb.Append("}\n#pragma warning restore IDE0055, IDE0008\n");
 }

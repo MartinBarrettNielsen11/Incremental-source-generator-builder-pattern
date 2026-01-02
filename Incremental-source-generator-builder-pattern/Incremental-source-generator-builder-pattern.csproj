@@ -19,6 +19,7 @@
     
     <ItemGroup>
         <InternalsVisibleTo Include="BimServices.BuilderGenerator.Tests" />
+        <InternalsVisibleTo Include="sample" />
     </ItemGroup>
 
     <Target Name="AddInternalsVisibleTo" BeforeTargets="CoreCompile">

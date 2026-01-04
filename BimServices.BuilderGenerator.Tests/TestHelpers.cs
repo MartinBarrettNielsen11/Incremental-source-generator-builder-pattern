@@ -51,4 +51,28 @@ internal sealed class TestHelpers
 
         return (runResult, compiledAssembly);
     }
+    
+    
+    internal static async Task<(ImmutableArray<Diagnostic> diagnostics, string[] Output)> GetGeneratedTrees<T>(
+        string[] sources, 
+        string[] stages) 
+        where T : IIncrementalGenerator, new()
+    {
+        IEnumerable<SyntaxTree> syntaxTrees = sources.Select(static s => CSharpSyntaxTree.ParseText(s));
+
+        var references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
+            .Select(_ => MetadataReference.CreateFromFile(_.Location))
+            .Concat(new[] { MetadataReference.CreateFromFile(typeof(T).Assembly.Location) });
+
+        CSharpCompilation compilation = CSharpCompilation.Create(
+            "BimServices.BuilderGenerator.Build",
+            syntaxTrees,
+            references,
+            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+        GeneratorDriverRunResult runResult = await RunGeneratorAndAssertOutput<T>(compilation, stages);
+
+        return (runResult.Diagnostics, runResult.GeneratedTrees.Select(gs => gs.ToString()).ToArray());
+    }
 }

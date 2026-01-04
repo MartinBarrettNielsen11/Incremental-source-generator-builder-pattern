@@ -1,3 +1,4 @@
+using Incremental_source_generator_builder_pattern;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Incremental_source_generator_builder_pattern;
@@ -5,11 +6,10 @@ namespace Incremental_source_generator_builder_pattern;
 /// <summary>
 /// Incremental source generator for creating Builder-classes.
 /// </summary>
-
 #pragma warning disable RS1038
 [Generator(LanguageNames.CSharp)]
 #pragma warning restore RS1038
-internal sealed class BuilderGenerator : IIncrementalGenerator
+internal sealed class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -18,23 +18,28 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             context.AddSource(
                 $"{Constants.BuilderAttributeName}.g.cs", 
                 SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
-            
+
             context.AddSource(
                 $"{Constants.DomainAssertionExtensions}.g.cs", 
-                SourceText.From(BuilderSourceEmitter.GenerateDomainAssertionExtensions(typeof(BuilderGenerator).Namespace!), Encoding.UTF8));
-
+                SourceText.From(BuilderSourceEmitter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), Encoding.UTF8));
         });
-        IncrementalValuesProvider<BuilderToGenerate> res = context.SyntaxProvider.ForAttributeWithMetadataName(
+        
+        IncrementalValuesProvider<BuilderToGenerate> builders = context.SyntaxProvider
+            .ForAttributeWithMetadataName(
                 $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",
+                // Performs a first-pass filtering of syntax nodes that could possibly represent a builder class
+                // we just return true - as it's guaranteed to always be a node decorated with that attribute!
+                
+                // Apply global predicate - as it is guarenteed to always be a node decorated with the Build attribute
                 predicate: static (_, _) => true,
-                transform: static (generatorAttributeSyntaxContext, ct) =>
-                    Transform(generatorAttributeSyntaxContext, ct))
+                transform: static (generatorAttributeSyntaxContext, ct) => 
+                    GetTypeToGenerate(generatorAttributeSyntaxContext, ct))
             .WithTrackingName(TrackingNames.InitialExtraction)
             .Where(static b => b is not null)
             .Select(static (b, _) => b!.Value)
             .WithTrackingName(TrackingNames.RemovingNulls);
 
-        context.RegisterSourceOutput(res, static (sourceProductionContext, builder) =>
+        context.RegisterSourceOutput(builders, static (sourceProductionContext, builder) =>
         {
             try
             {
@@ -58,16 +63,17 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
             }
         });
     }
-
-    private static BuilderToGenerate? Transform(GeneratorAttributeSyntaxContext sc, CancellationToken ct)
+    
+    // Transform the syntax context
+    private static BuilderToGenerate? GetTypeToGenerate(GeneratorAttributeSyntaxContext syntaxContext, CancellationToken ct)
     {
-        var stopWatch = Stopwatch.StartNew();
+        var stopwatch = Stopwatch.StartNew();
         
-        if (sc.TargetSymbol is not INamedTypeSymbol builderSymbol)
+        if (syntaxContext.TargetSymbol is not INamedTypeSymbol builderSymbol)
             return null;
 
         // Get the target type from the attribute [BuilderFor(typeof(Entity))]
-        AttributeData? attribute = sc.Attributes.FirstOrDefault();
+        AttributeData? attribute = syntaxContext.Attributes.FirstOrDefault();
         
         if (attribute?.ConstructorArguments.Length is not > 0)
             return null;
@@ -77,17 +83,17 @@ internal sealed class BuilderGenerator : IIncrementalGenerator
 
         // short-circuit the transformation if additional changes are detected
         ct.ThrowIfCancellationRequested();
-        
-        INamedTypeSymbol? typeICollection = sc.SemanticModel.Compilation
+
+        INamedTypeSymbol? typeICollection = syntaxContext.SemanticModel.Compilation
             .GetTypeByMetadataName(typeof(ICollection<>).FullName!);
 
         Properties properties = Helpers.GetPropertySymbols(typeICollection!, targetType);
-        
+
         return new BuilderToGenerate(
             BuilderClassName: builderSymbol.Name,
             BuilderClassNamespace: builderSymbol.ContainingNamespace.ToString(),
             Properties: properties,
             TargetClassFullName: targetType.ToString(),
-            ElapsedTime: stopWatch.Elapsed);
+            ElapsedTime: stopwatch.Elapsed);
     }
 }

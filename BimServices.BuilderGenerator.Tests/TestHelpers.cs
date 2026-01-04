@@ -30,7 +30,7 @@ internal sealed class TestHelpers
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new Incremental_source_generator_builder_pattern.BuilderGenerator();
+        var generator = new Incremental_source_generator_builder_pattern.Generator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 

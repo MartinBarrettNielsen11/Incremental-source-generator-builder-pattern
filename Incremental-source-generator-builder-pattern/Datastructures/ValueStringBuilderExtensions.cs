@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Incremental_source_generator_builder_pattern;
 
-namespace BimServices.BuilderGenerator
+namespace Incremental_source_generator_builder_pattern
 {
 
     /// <summary>

@@ -5,7 +5,7 @@ internal static class Constants
     /// <summary>
     /// The name used in the GeneratedCode attribute.
     /// </summary>
-    internal const string GeneratorName = "BimServices.BuilderGenerator";
+    internal const string GeneratorName = "Incremental_source_generator_builder_pattern";
 
     /// <summary>
     /// The version number embedded in generated files.

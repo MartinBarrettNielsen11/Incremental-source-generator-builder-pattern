@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace Incremental_source_generator_builder_pattern.Tests;
@@ -62,4 +63,16 @@ public class FunctionalTests
             .IsGreaterThan(0, "The generator should produce output");
     }
 
+    
+    [Test]
+    public async Task NoDiagnosticsAreReported()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<Diagnostic> diagnostics = runResult.Diagnostics;
+        await Assert.That(diagnostics.Length).IsEqualTo(0);
+    }
+    // add test on "Test2" to show that only one attributeFor file is generated in case you produce two separate builder classes
+
+    
 }

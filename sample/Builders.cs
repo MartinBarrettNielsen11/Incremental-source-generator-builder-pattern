@@ -1,5 +1,3 @@
-using BimServices.BuilderGenerator;
-
 namespace sample;
 
 [Builder(typeof(Entity1))]

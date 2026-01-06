@@ -74,5 +74,12 @@ public class FunctionalTests
     }
     // add test on "Test2" to show that only one attributeFor file is generated in case you produce two separate builder classes
 
-    
+    [Test]
+    public async Task OnlyOneBuilderClassIsGeneratedForDomainWithPartialKeyword()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
+        await Assert.That(syntaxTrees.Length).IsEqualTo(3);
+    }
 }

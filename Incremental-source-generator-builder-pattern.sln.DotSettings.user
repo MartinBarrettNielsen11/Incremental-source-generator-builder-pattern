@@ -6,6 +6,6 @@
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=d9cba0a8_002Da491_002D477f_002D95dd_002D211f5bd54de3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="FunctionalTests #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
-    &lt;TestId&gt;Testing Platform::3D2D9CF4-F705-477C-8C0A-E42763859F8D::net8.0::BimServices.BuilderGenerator.Tests.FunctionalTests&lt;/TestId&gt;
+    &lt;TestId&gt;Testing Platform::3D2D9CF4-F705-477C-8C0A-E42763859F8D::net8.0::Incremental_source_generator_builder_pattern.Tests.FunctionalTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

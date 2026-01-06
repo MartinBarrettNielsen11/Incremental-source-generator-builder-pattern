@@ -1,12 +1,14 @@
 using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Incremental_source_generator_builder_pattern.Tests;
 
 public class FunctionalTests
 {
     private static readonly string Example1 = $"{typeof(FunctionalTests).Namespace}.TestData.Test1.cs";
-
+    private static readonly string Example2 = $"{typeof(FunctionalTests).Namespace}.TestData.Test2.cs";
+    
     private readonly VerifySettings _settings = new();
 
     [Test]
@@ -82,4 +84,32 @@ public class FunctionalTests
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(3);
     }
+    
+    
+    [Test]
+    public async Task Multiple_builders_with_same_name_in_different_namespaces_results_in_two_builders_being_generated()
+    {
+        var builder1TypeName = "Incremental_source_generator_builder_pattern.Tests.TestData.v1.TestEntityBuilder";
+        var builder2TypeName = "Incremental_source_generator_builder_pattern.Tests.TestData.v2.TestEntityBuilder";
+        
+        Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(Example2)!;
+        string source = SourceText.From(mrs).ToString();
+        var (runResult, compiledAssembly) = await TestHelpers.ParseAndDriveResult(source);
+        
+        await Assert.That(runResult.GeneratedTrees.Length).IsEqualTo(4);
+        
+        await Assert.That(runResult.GeneratedTrees
+            .Any(gt => gt.FilePath == "Incremental_source_generator_builder_pattern/Incremental_source_generator_builder_pattern_Tests_TestData_v1_TestEntityBuilder.cs")).IsTrue();
+        
+        object? builder1 = compiledAssembly.CreateInstance(builder1TypeName);
+        await Assert.That(builder1).IsNotNull();
+        
+        await Assert.That(runResult.GeneratedTrees
+            .Any(gt => gt.FilePath == "Incremental_source_generator_builder_pattern/Incremental_source_generator_builder_pattern_Tests_TestData_v2_TestEntityBuilder.cs")).IsTrue();
+
+        object? builder2 = compiledAssembly.CreateInstance(builder2TypeName);
+        
+        await Assert.That(builder2).IsNotNull();
+    }
+
 }

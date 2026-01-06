@@ -1,4 +1,4 @@
-namespace BimServices.BuilderGenerator.Tests.TestData;
+namespace Incremental_source_generator_builder_pattern.Tests.TestData;
 
 public partial class Country
 {

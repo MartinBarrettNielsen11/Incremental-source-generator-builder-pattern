@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Assembly = System.Reflection.Assembly;
 
-namespace BimServices.BuilderGenerator.Tests;
+namespace Incremental_source_generator_builder_pattern.Tests;
 
 internal sealed class TestHelpers
 {

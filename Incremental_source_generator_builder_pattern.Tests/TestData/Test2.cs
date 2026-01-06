@@ -1,6 +1,6 @@
 using BimServices.BuilderGenerator;
 
-namespace BimServices.BuilderGenerator.Tests.TestData.v1
+namespace Incremental_source_generator_builder_pattern.Tests.TestData.v1;
 {
     public class TestEntity
     {
@@ -11,7 +11,7 @@ namespace BimServices.BuilderGenerator.Tests.TestData.v1
     public partial class TestEntityBuilder { }
 }
 
-namespace BimServices.BuilderGenerator.Tests.TestData.v2
+namespace Incremental_source_generator_builder_pattern.Tests.TestData.v2;
 {
     public class TestEntity
     {

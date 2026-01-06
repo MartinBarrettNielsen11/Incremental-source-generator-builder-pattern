@@ -1,4 +1,4 @@
-namespace BimServices.BuilderGenerator.Tests;
+namespace Incremental_source_generator_builder_pattern.Tests;
 
 internal sealed class TrackingNames
 {

@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace BimServices.BuilderGenerator.Tests;
+namespace Incremental_source_generator_builder_pattern.Tests;
 
 public class FunctionalTests
 {
@@ -51,8 +51,8 @@ public class FunctionalTests
             TrackingNames.RemovingNulls
         };
 
-        var (diagnostics, output) = await TestHelpers.GetGeneratedTrees<BuilderGenerator>([input], stages);
-
+        var (diagnostics, output) = await TestHelpers.GetGeneratedTrees<Generator>([input], stages);
+        
         // Assert — verify no diagnostics were emitted
         await Assert.That(diagnostics.Length)
             .IsEqualTo(0, "There should be no diagnostics during memoization test");

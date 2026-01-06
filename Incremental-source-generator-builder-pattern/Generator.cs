@@ -9,7 +9,7 @@ namespace Incremental_source_generator_builder_pattern;
 #pragma warning disable RS1038
 [Generator(LanguageNames.CSharp)]
 #pragma warning restore RS1038
-internal sealed class Generator : IIncrementalGenerator
+public sealed class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {

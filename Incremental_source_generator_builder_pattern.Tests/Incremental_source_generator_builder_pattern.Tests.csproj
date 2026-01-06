@@ -5,7 +5,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <RootNamespace>BimServices.BuilderGenerator.Tests</RootNamespace>
+    <RootNamespace>Incremental_source_generator_builder_pattern.Tests</RootNamespace>
+    <AssemblyName>Incremental_source_generator_builder_pattern.Tests</AssemblyName>
 </PropertyGroup>
 
 <ItemGroup>

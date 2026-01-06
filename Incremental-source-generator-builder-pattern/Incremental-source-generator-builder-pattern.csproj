@@ -18,7 +18,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <InternalsVisibleTo Include="BimServices.BuilderGenerator.Tests" />
+        <InternalsVisibleTo Include="Incremental-source-generator-builder-pattern.Tests" />
         <InternalsVisibleTo Include="sample" />
     </ItemGroup>
 

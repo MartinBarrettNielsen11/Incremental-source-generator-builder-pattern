@@ -112,4 +112,12 @@ public class FunctionalTests
         await Assert.That(builder2).IsNotNull();
     }
 
+    [Test]
+    public async Task Only_one_attribute_For_file_is_generated_when_generating_two_separate_builders()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example2);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
+        await Assert.That(syntaxTrees.Length).IsEqualTo(4);
+    }
 }

@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using System.Reflection;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using TUnit.Core.Helpers;
 
 namespace Incremental_source_generator_builder_pattern.Tests;
 
@@ -120,4 +122,111 @@ public class FunctionalTests
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(4);
     }
+    
+    
+    
+    [Test]
+    public async Task Correct_methods_are_generated_checked_via_reflection()
+    {
+        var builderTypeName = "BimServices.BuilderGenerator.Tests.TestData.EntityBuilder";
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        object? testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
+        var methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        _settings.UseDirectory("Snapshots");
+        await Verify(methods, _settings);
+    }
+    
+    [Test]
+    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_DIRECT_VERSION()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        object? testBuilder = compiledAssembly.CreateInstance("BimServices.BuilderGenerator.Tests.TestData.EntityBuilder");
+        MethodInfo directGeneratedWithMethod = testBuilder!
+            .GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(m => m.Name.StartsWith("WithName"))
+            .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
+
+        var newName = "new-name";
+        
+        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
+        await Assert.That(testBuilder).IsEqualTo(res);
+    }
+    
+    [Test]
+    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods2()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        object? testBuilder = compiledAssembly.CreateInstance("BimServices.BuilderGenerator.Tests.TestData.EntityBuilder");
+        MethodInfo directGeneratedWithMethod = testBuilder!
+            .GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(m => m.Name.StartsWith("WithName"))
+            .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
+
+        var newName = "new-name";
+        
+        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
+        await Assert.That(testBuilder).IsEqualTo(res);
+        
+        MethodInfo? buildMethod = testBuilder.GetType().GetMethod("Build");
+        object? entity = buildMethod!.Invoke(testBuilder, null);
+        
+        _settings.UseDirectory("Snapshots");
+        await Verify(entity.ToObjectArray(), _settings);
+    }
+
+    
+    [Test]
+    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_on_collections()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        object? testBuilder = compiledAssembly.CreateInstance("BimServices.BuilderGenerator.Tests.TestData.EntityBuilder");
+
+        var entity2Type = testBuilder!.GetType().Assembly
+            .GetType("BimServices.BuilderGenerator.Tests.TestData.Entity2");
+        
+        var listType = typeof(List<>).MakeGenericType(entity2Type!);
+        object countriesList = Activator.CreateInstance(listType)!;
+
+        PropertyInfo? piCountryName = entity2Type!.GetProperty("Property2");
+
+        object? countryDk = Activator.CreateInstance(entity2Type);
+        piCountryName!.SetValue(countryDk, "DK");
+
+        object? countryUs = Activator.CreateInstance(entity2Type);
+        piCountryName.SetValue(countryUs, "US");
+
+        listType.InvokeMember(
+            "Add",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod,
+            binder: null,
+            target: countriesList,
+            args: [countryDk]);
+
+        listType.InvokeMember(
+            "Add",
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod,
+            binder: null,
+            target: countriesList,
+            args: [countryUs]);
+
+        MethodInfo? miWithEntityList = testBuilder.GetType()
+            .GetMethod("WithEntityList", [listType]);
+
+        object? resultBuilder = miWithEntityList!.Invoke(testBuilder, [countriesList]);
+
+        await Assert.That(resultBuilder).IsEquivalentTo(testBuilder);
+        
+        MethodInfo? buildMethod = testBuilder.GetType().GetMethod("Build");
+        object? entity = buildMethod!.Invoke(testBuilder, null);
+        
+        _settings.UseDirectory("Snapshots");
+        await Verify(entity.ToObjectArray(), _settings);
+    }
+    
 }

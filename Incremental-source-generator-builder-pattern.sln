@@ -12,6 +12,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{FC295F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sample", "sample\sample.csproj", "{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E60BF519-8BFF-41CF-B7FD-737B22C1DB9A}"
+	ProjectSection(SolutionItems) = preProject
+		ReadMe.md = ReadMe.md
+		DesignDecisions.md = DesignDecisions.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

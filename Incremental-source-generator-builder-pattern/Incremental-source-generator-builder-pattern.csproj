@@ -19,6 +19,7 @@
     
     <ItemGroup>
         <InternalsVisibleTo Include="Incremental-source-generator-builder-pattern.Tests" />
+        <InternalsVisibleTo Include="Benchmarks" />
         <InternalsVisibleTo Include="sample" />
     </ItemGroup>
 

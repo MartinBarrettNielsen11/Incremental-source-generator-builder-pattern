@@ -56,7 +56,7 @@ internal static class BuilderSourceEmitter
         return vsb.ToString();
     }
     
-    internal static string GenerateBuilder(BuilderToGenerate builder)
+    internal static string GenerateBuilder(in BuilderToGenerate builder)
     {
         var vsb = new ValueStringBuilder(8_192);
 
@@ -69,7 +69,7 @@ internal static class BuilderSourceEmitter
         return vsb.ToString();
     }
 
-    private static void AppendHeader(ref ValueStringBuilder vsb, BuilderToGenerate builder)
+    private static void AppendHeader(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
 //#if DEBUG
         vsb.Append("//----------------------------------------------------------------------------------\n");
@@ -90,7 +90,7 @@ internal static class BuilderSourceEmitter
         vsb.AppendInterpolated($"public partial class {builder.BuilderClassName}\n{{\n");
     }
 
-    private static void AppendFields(ref ValueStringBuilder vsb, BuilderToGenerate builder)
+    private static void AppendFields(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         vsb.AppendInterpolated($"    private Func<{builder.TargetClassFullName}> {Constants.FactoryName} = () => new();\n");
         vsb.AppendInterpolated($"    private readonly List<Action<{builder.TargetClassFullName}>> {Constants.DomainListName} = new();\n");
@@ -105,7 +105,7 @@ internal static class BuilderSourceEmitter
         vsb.Append("\n");
     }
 
-    private static void AppendWithMethods(ref ValueStringBuilder vsb, BuilderToGenerate builder)
+    private static void AppendWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         foreach (var prop in builder.Properties.AllProperties)
         {
@@ -124,7 +124,7 @@ internal static class BuilderSourceEmitter
         }
     }
 
-    private static void AppendBuildMethod(ref ValueStringBuilder vsb, BuilderToGenerate builder)
+    private static void AppendBuildMethod(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     { 
         vsb.AppendInterpolated($"    /// <summary> Returns configured of instance of the {builder.TargetClassFullName} entity </summary>\n");
         vsb.AppendInterpolated($"    public {builder.TargetClassFullName} Build()\n");

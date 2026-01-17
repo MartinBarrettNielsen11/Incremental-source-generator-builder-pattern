@@ -14,3 +14,11 @@ While arrays are a natural fit for representing ordered collections of symbols, 
 This ensures that semantically equivalent property sets—such as when a user edits unrelated code—do not cause downstream pipeline stages to re-execute. In practice, this significantly improves cache hit rates and prevents unnecessary regeneration when the underlying type structure is unchanged.
 
 All higher-level models (e.g. `BuilderToGenerate`, `PropertyInfoModel`) are defined as value-equatable record structs composed exclusively of primitive types and equatable collections. This guarantees that every pipeline boundary is stable, comparable, and incrementally safe.
+
+
+### Efficient and Predictable Code Emission
+
+Code emission is designed with the same predictability constraints as the pipeline itself.  
+Generating source files can involve assembling large volumes of text, and naïve concatenation patterns introduce unnecessary allocations, copying, and input-size–dependent performance characteristics.
+
+To mitigate this, a custom `ValueStringBuilder` is used as the backbone of code generation. The builder is initialized with a conservatively estimated capacity and leverages stack allocation for small to medium outputs, falling back to pooled arrays only when necessary. This strategy minimizes garbage creation, avoids repeated buffer growth, and ensures that the emission phase remains fast, allocation-conscious, and deterministic, without compromising clarity or maintainability of the generated output.

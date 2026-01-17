@@ -1,158 +1,236 @@
 
 namespace Incremental_source_generator_builder_pattern;
 
+
 internal static class BuilderSourceEmitter
 {
-    internal static string GenerateBuilderAttribute(string builderAttributeName)
-    {
-        var vsb = new ValueStringBuilder(512);
-        vsb.Append("#nullable enable\n");
-        vsb.Append("#pragma warning disable CA1813, CA1019, IDE0065, IDE0034, IDE0055\n\n");
-        vsb.Append("using System;\n\n");
-        vsb.AppendInterpolated($"namespace {Constants.GeneratorName};\n\n");
-        vsb.AppendInterpolated($"[System.CodeDom.Compiler.GeneratedCode(\"{Constants.GeneratorName}\", \"{Constants.GeneratorVersion}\")]\n");
-        vsb.Append("[AttributeUsage(AttributeTargets.Class)]\n");
-        vsb.AppendInterpolated($"public sealed class {builderAttributeName}(Type type) : Attribute\n{{\n");
-        vsb.Append("    public Type TargetType { get; } = type;\n");
-        vsb.Append("}\n");
-        vsb.Append("#pragma warning restore CA1813, CA1019, IDE0065, IDE0034, IDE0055\n");
+    internal static string GenerateBuilderAttribute(string builderAttributeName) =>
+        $$$"""
+           #nullable enable
+           #pragma warning disable CA1813, CA1019, IDE0065, IDE0034, IDE0055
 
-        var yo = vsb.ToString();
-        return yo;
-    }
-    
-    internal static string GenerateDomainAssertionExtensions(string builderProduct)
-    {
-        var vsb = new ValueStringBuilder(1024);
-        vsb.Append("#pragma warning disable IDE0055, IDE0008\n");
-        vsb.Append("#nullable enable\n\n");
-        vsb.Append("using System;\n");
-        vsb.Append("using System.Collections.Generic;\n\n");
-        vsb.AppendInterpolated($"namespace {builderProduct};\n\n");
-        vsb.Append($"[System.CodeDom.Compiler.GeneratedCode(\"{Constants.GeneratorName}\", \"{Constants.GeneratorVersion}\")]\n");
-        vsb.AppendInterpolated($"public static class {Constants.DomainAssertionExtensions}\n");
-        vsb.Append("{\n");
-        vsb.Append("    /// <summary>\n");
-        vsb.Append("    /// Adds a domain validation rule to be executed during the build phase.\n");
-        vsb.Append("    /// </summary>\n");
-        vsb.Append("    /// <typeparam name=\"TEntity\">The entity type the rule applies to.</typeparam>\n");
-        vsb.AppendInterpolated($"    /// <param name=\"{Constants.DomainListName}\">The list of post-build domain rules.</param>\n");
-        vsb.Append("    /// <param name=\"predicate\">A function that returns true when the entity violates a rule.</param>\n");
-        vsb.Append("    /// <param name=\"errorMessage\">The error message that will be thrown if the rule fails.</param>\n");
-        vsb.Append("    public static void AddDomainRule<TEntity>(\n");
-        vsb.AppendInterpolated($"        this List<Action<TEntity>> {Constants.DomainListName},\n");
-        vsb.Append("        Func<TEntity, bool> predicate,\n");
-        vsb.Append("        string errorMessage)\n");
-        vsb.Append("    {\n");
-        vsb.AppendInterpolated($"        {Constants.DomainListName}.Add(e =>\n");
-        vsb.Append("        {\n");
-        vsb.Append("            if (predicate(e))\n");
-        vsb.Append("                throw new InvalidOperationException(errorMessage);\n");
-        vsb.Append("        });\n");
-        vsb.Append("    }\n");
-        vsb.Append("}\n");
-        vsb.Append("#pragma warning restore IDE0055, IDE0008\n");
+           using System;
 
-        return vsb.ToString();
-    }
-    
+           namespace {{{Constants.GeneratorName}}};
+
+           [System.CodeDom.Compiler.GeneratedCode("{{{Constants.GeneratorName}}}", "{{{Constants.GeneratorVersion}}}")]
+           [AttributeUsage(AttributeTargets.Class)]
+           public sealed class {{{builderAttributeName}}}(Type type) : Attribute
+           {
+               public Type TargetType { get; } = type;
+           }
+
+           #pragma warning restore CA1813, CA1019, IDE0065, IDE0034, IDE0055
+           """;
+
+    internal static string GenerateDomainAssertionExtensions(string builderProduct) =>
+        $$$"""
+           #pragma warning disable IDE0055, IDE0008
+           #nullable enable
+
+           using System;
+           using System.Collections.Generic;
+
+           namespace {{{builderProduct}}};
+
+           [System.CodeDom.Compiler.GeneratedCode("{{{Constants.GeneratorName}}}", "{{{Constants.GeneratorVersion}}}")]
+           public static class {{{Constants.DomainAssertionExtensions}}}
+           {
+               /// <summary>
+               /// Adds a domain validation rule to be executed during the build phase.
+               /// </summary>
+               /// <param name="{{{Constants.DomainListName}}}">The list of post-build domain rules.</param>
+               /// <param name="predicate">A function that returns true when the entity violates a rule.</param>
+               /// <param name="errorMessage">The error message that will be thrown if the rule fails.</param>
+               public static void AddDomainRule<TEntity>(
+                   this List<Action<TEntity>> {{{Constants.DomainListName}}},
+                   Func<TEntity, bool> predicate,
+                   string errorMessage)
+               {
+                   {{{Constants.DomainListName}}}.Add(e =>
+                   {
+                       if (predicate(e))
+                           throw new InvalidOperationException(errorMessage);
+                   });
+               }
+           }
+
+           #pragma warning restore IDE0055, IDE0008
+           """;
+
     internal static string GenerateBuilder(in BuilderToGenerate builder)
     {
-        var vsb = new ValueStringBuilder(8_192);
 
-        AppendHeader(ref vsb, builder);
-        AppendFields(ref vsb, builder);
-        AppendWithMethods(ref vsb, builder);
-        AppendBuildMethod(ref vsb, builder);
-        AppendFooter(ref vsb);
+        var estimated = EstimateInitialCapacity(builder);
+
+        var conservativeStackLimit = 2048;
+
+        Span<char> initial = estimated < conservativeStackLimit
+            ? stackalloc char[estimated]
+            : stackalloc char[conservativeStackLimit];
+
+        var vsb = new ValueStringBuilder(initial);
+
+        GenerateHeader(ref vsb, builder);
+        GenerateFields(ref vsb, builder);
+        GenerateWithMethods(ref vsb, builder);
+        GenerateBuildMethod(ref vsb, builder);
+        GenerateFooter(ref vsb);
 
         return vsb.ToString();
+
+    }
+    
+
+    private static void GenerateHeader(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    {
+        vsb.Append(
+            $$$"""
+               #nullable enable
+               #pragma warning disable IDE0055, IDE0008
+
+               using System;
+               using System.Linq;
+               using System.Collections.Generic;
+               using BimServices.BuilderGenerator;
+
+               namespace {{{builder.BuilderClassNamespace}}};
+
+               [System.CodeDom.Compiler.GeneratedCode("{{{Constants.GeneratorName}}}", "{{{Constants.GeneratorVersion}}}")]
+               public partial class {{{builder.BuilderClassName}}}
+               {
+               
+               """.AsSpan());
     }
 
-    private static void AppendHeader(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void GenerateFields(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
-//#if DEBUG
-        vsb.Append("//----------------------------------------------------------------------------------\n");
-        vsb.Append("// <auto-generated>\n");
-        vsb.AppendInterpolated($"// This code was generated by BuilderGenerator at {DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss")} in {builder.ElapsedTime.ToString()}.\n");
-        vsb.Append("// </auto-generated>\n");
-        vsb.Append("//----------------------------------------------------------------------------------\n");
-//#endif
-        vsb.Append("#nullable enable\n");
-        vsb.Append("#pragma warning disable IDE0055, IDE0008\n\n");
-        vsb.Append("using System;\n");
-        vsb.Append("using System.Linq;\n");
-        vsb.Append("using System.Collections.Generic;\n");
-        vsb.Append("using BimServices.BuilderGenerator;\n");
+        vsb.Append($""" 
+                         private Func<{builder.TargetClassFullName}> {Constants.FactoryName} = () => new();   
+                         private readonly List<Action<{builder.TargetClassFullName}>> {Constants.DomainListName} = new();
+                     """.AsSpan());
+        vsb.Append("\n".AsSpan());
         
-        vsb.AppendInterpolated($"namespace {builder.BuilderClassNamespace};\n\n");
-        vsb.AppendInterpolated($"[System.CodeDom.Compiler.GeneratedCode(\"{Constants.GeneratorName}\", \"{Constants.GeneratorVersion}\")]\n");
-        vsb.AppendInterpolated($"public partial class {builder.BuilderClassName}\n{{\n");
-    }
-
-    private static void AppendFields(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
-    {
-        vsb.AppendInterpolated($"    private Func<{builder.TargetClassFullName}> {Constants.FactoryName} = () => new();\n");
-        vsb.AppendInterpolated($"    private readonly List<Action<{builder.TargetClassFullName}>> {Constants.DomainListName} = new();\n");
-
-         foreach (var property in builder.Properties.AllProperties)
-         { 
-            var type = property.TypeName;
-            var camelCase = char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
-            vsb.AppendInterpolated($"    private Func<{type}>? _{camelCase};\n");
+        foreach (var prop in builder.Properties.AllProperties)
+        {
+            var type = prop.TypeName;
+            var camelCase = char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
+            vsb.Append($"    private Func<{type}>? _{camelCase};\n".AsSpan());
         }
-
-        vsb.Append("\n");
     }
 
-    private static void AppendWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void GenerateWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         foreach (var prop in builder.Properties.AllProperties)
         {
             var type = prop.TypeName;
             var name = prop.Name;
             var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
-            
-            vsb.AppendInterpolated($"    public {builder.BuilderClassName} {Constants.WithMethodPrefix}{name}({type} @{camelCase})\n");
-            vsb.Append("    {\n");
-            vsb.AppendInterpolated($"        return {Constants.WithMethodPrefix}{name}(() => @{camelCase});\n");
-            vsb.Append("    }\n");
-            vsb.AppendInterpolated($"    public {builder.BuilderClassName} {Constants.WithMethodPrefix}{name}(Func<{type}> @{camelCase})\n");
-            vsb.Append("    {\n");
-            vsb.AppendInterpolated($"        _{camelCase} = @{camelCase};\n");
-            vsb.Append("        return this;\n    }\n\n");
+
+            vsb.Append(
+                $$$"""
+                   
+                       public {{{builder.BuilderClassName}}} {{{Constants.WithMethodPrefix}}}{{{name}}}({{{type}}} @{{{camelCase}}})
+                       {
+                           return {{{Constants.WithMethodPrefix}}}{{{name}}}(() => @{{{camelCase}}});
+                       }
+                       public {{{builder.BuilderClassName}}} {{{Constants.WithMethodPrefix}}}{{{name}}}(Func<{{{type}}}> @{{{camelCase}}})
+                       {
+                           _{{{camelCase}}} = @{{{camelCase}}};
+                           return this;
+                       }
+
+                   """.AsSpan());
         }
     }
 
-    private static void AppendBuildMethod(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
-    { 
-        vsb.AppendInterpolated($"    /// <summary> Returns configured of instance of the {builder.TargetClassFullName} entity </summary>\n");
-        vsb.AppendInterpolated($"    public {builder.TargetClassFullName} Build()\n");
-        vsb.Append("    {\n");
-        vsb.AppendInterpolated($"        {builder.TargetClassFullName} instance = {Constants.FactoryName}();\n\n");
+    private static void GenerateBuildMethod(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    {
+        vsb.Append(
+            $$"""
+                   /// <summary> 
+                   /// Returns configured instance of {{builder.TargetClassFullName}} 
+                   /// </summary>
+                   public {{builder.TargetClassFullName}} Build()
+                   {
+                       {{builder.TargetClassFullName}} instance = {{Constants.FactoryName}}();
+
+               """.AsSpan());
 
         foreach (var prop in builder.Properties.Normal)
         {
             var name = prop.Name;
             var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
 
-            vsb.AppendInterpolated($"        if(_{camelCase} is not null)\n");
-            vsb.AppendInterpolated($"            instance.{name} = _{camelCase}.Invoke();\n\n");
+            vsb.Append(
+                $$$"""
+                   
+                           if(_{{{camelCase}}} is not null)
+                               instance.{{{name}}} = _{{{camelCase}}}.Invoke();
+
+                   """.AsSpan());
         }
 
         foreach (var prop in builder.Properties.Collection)
         {
             var name = prop.Name;
             var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
-            vsb.AppendInterpolated($"        _{camelCase}?.Invoke()?\n");
-            vsb.Append("        .ToList()\n");
-            vsb.AppendInterpolated($"        .ForEach(item => instance.{name}.Add(item));\n\n");
+            vsb.Append("\n".AsSpan());
+
+            vsb.Append(
+                $"""
+                           _{camelCase}?.Invoke()?
+                               .ToList()
+                               .ForEach(item => instance.{name}.Add(item));
+
+                   """.AsSpan());
         }
 
-        vsb.AppendInterpolated($"        {Constants.DomainListName}.ForEach(action => action(instance));\n\n");
-        vsb.Append("        return instance;\n}");
+        vsb.Append(
+            $$"""
+               
+                       {{Constants.DomainListName}}.ForEach(action => action(instance));
+
+                       return instance;
+                   }
+
+               """.AsSpan());
     }
+
+    private static void GenerateFooter(ref ValueStringBuilder vsb) =>
+        vsb.Append(
+            $$"""
+               }
+               
+               #pragma warning restore IDE0055, IDE0008
+               """.AsSpan());
     
-    private static void AppendFooter(ref ValueStringBuilder vsb) =>
-        vsb.Append("}\n#pragma warning restore IDE0055, IDE0008\n");
+    private static int EstimateInitialCapacity(in BuilderToGenerate builder)
+    {
+        const int header = 300;
+        const int footer = 100;
+        const double padding = 1.05;
+
+        var allProps = builder.Properties.AllProperties;
+        var collectionCount = builder.Properties.Collection.Count;
+
+        // Compute averages
+        var totalNameLen = 0;
+        var totalTypeLen = 0;
+
+        foreach (var p in allProps)
+        {
+            totalNameLen += p.Name.Length;
+            totalTypeLen += p.TypeName.Length;
+        }
+
+        var avgNameLen = allProps.Count > 0 ? totalNameLen / allProps.Count : 0;
+        var avgTypeLen = allProps.Count > 0 ? totalTypeLen / allProps.Count : 0;
+
+        var perPropertyCost = 310 + avgNameLen + avgTypeLen;
+
+        var total = header + (allProps.Count * perPropertyCost) + (collectionCount * 150) + footer;
+
+        return (int)(total * padding);
+    }
 }

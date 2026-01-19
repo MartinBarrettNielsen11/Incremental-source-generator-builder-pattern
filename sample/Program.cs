@@ -1,30 +1,29 @@
 ﻿using sample;
 
-var builderForEntity1_simple = Entity1Builder.Simple().Build();
-var b = Entity1Builder.Typical().WithEntity2List(new List<Entity2>
-{
-    Entity2Builder.Typical().Build(), Entity2Builder.Typical().WithVal("yoooo").Build()
-}).Build();
+Entity1 entity1V1 = Entity1Builder.Minimal()
+    .WithId(Guid.CreateVersion7)
+    .WithEntity2List(new List<Entity2>()
+    {
+        Entity2Builder.Typical()
+            .WithId(Guid.CreateVersion7)
+            .Build(),
+    })
+    .WithMaximumPrice(2_000)
+    .Build();
 
-var builder = new Entity2Builder().WithId(() => Guid.NewGuid());
+Console.WriteLine(entity1V1);
 
-/* unique ids */
-Console.WriteLine(builder.Build().Id);
-Console.WriteLine(builder.Build().Id);
 
-var builder2 = new Entity2Builder().WithId(Guid.NewGuid());
+Entity1 entity1V2 = Entity1Builder.Committed()
+    .WithId(Guid.CreateVersion7)
+    .Build();
 
-/* same id */
-Console.WriteLine(builder2.Build().Id);
-Console.WriteLine(builder2.Build().Id);
+Console.WriteLine(entity1V2);
 
-var v3 = Entity3Builder.Typical().Build();
+var entityV2NoBuild = Entity2Builder.Typical()
+    .WithEntity3List(new List<Entity3>()
+    {
+        Entity3Builder.Minimal().WithMaximumPrice(5).Build()
+    }).Build();
 
-var builderForEntity2_typical = Entity2Builder.Typical().Build();
-
-var builderForEntity3_simple = Entity3Builder.Simple().Build();
-var builderForEntity3_typical_nobuild = Entity3Builder.Typical().WithMinimumPrice(1_000);
-
-var yo = builderForEntity3_typical_nobuild.Build();
-
-var builderForEntity2_typical2 = Entity2Builder.Typical().Build();
+Console.WriteLine(entityV2NoBuild);

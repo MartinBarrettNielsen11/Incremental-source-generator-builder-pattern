@@ -31,6 +31,16 @@ public class BuilderGeneratorBenchmarks
        | Then_the_output_is_generated_big_version | 3.414 ms | 0.0670 ms | 0.0594 ms | 3.395 ms | 27.3438 | 7.8125 | 187.53 KB |
        
      */
+    
+    // optimized struct copying
+    /*
+     *| Method                                   | Mean     | Error     | StdDev    | Median   | Gen0    | Gen1   | Allocated |
+       |----------------------------------------- |---------:|----------:|----------:|---------:|--------:|-------:|----------:|
+       | Then_the_expected_output_is_generated    | 3.151 ms | 0.0934 ms | 0.2740 ms | 3.063 ms |  7.8125 |      - |  62.47 KB |
+       | Then_the_output_is_generated_big_version | 3.518 ms | 0.0675 ms | 0.0693 ms | 3.510 ms | 27.3438 | 7.8125 | 188.77 KB |
+
+     */
+    
     [Benchmark]
     public GeneratorDriverRunResult Then_the_expected_output_is_generated()
     {

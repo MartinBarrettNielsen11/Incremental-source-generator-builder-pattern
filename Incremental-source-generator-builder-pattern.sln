@@ -1,16 +1,16 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incremental-source-generator-builder-pattern", "Incremental-source-generator-builder-pattern\Incremental-source-generator-builder-pattern.csproj", "{3E2CD539-362A-4079-A87E-A2B86693CFC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator", "Generator\Generator.csproj", "{3E2CD539-362A-4079-A87E-A2B86693CFC2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{52D5A59E-52C9-45A1-A83D-ED66DD077E8C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{6E25E408-5092-4B31-921F-531BD2F05244}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Incremental_source_generator_builder_pattern.Tests", "Incremental_source_generator_builder_pattern.Tests\Incremental_source_generator_builder_pattern.Tests.csproj", "{3D2D9CF4-F705-477C-8C0A-E42763859F8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Tests", "Generator.Tests\Generator.Tests.csproj", "{3D2D9CF4-F705-477C-8C0A-E42763859F8D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "sample", "sample", "{FC295FAE-7AE8-4820-8828-51D2CB61B1D7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sample", "sample\sample.csproj", "{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Demo", "Generator.Demo\Generator.Demo.csproj", "{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E60BF519-8BFF-41CF-B7FD-737B22C1DB9A}"
 	ProjectSection(SolutionItems) = preProject
@@ -18,7 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{E60BF519-8
 		DesignDecisions.md = DesignDecisions.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Benchmarks", "Benchmarks\Benchmarks.csproj", "{FD102138-7E22-400C-8D50-6C91DE246A7C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Generator.Benchmarks", "Generator.Benchmarks\Generator.Benchmarks.csproj", "{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -38,15 +38,15 @@ Global
 		{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD102138-7E22-400C-8D50-6C91DE246A7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD102138-7E22-400C-8D50-6C91DE246A7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD102138-7E22-400C-8D50-6C91DE246A7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD102138-7E22-400C-8D50-6C91DE246A7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3E2CD539-362A-4079-A87E-A2B86693CFC2} = {52D5A59E-52C9-45A1-A83D-ED66DD077E8C}
 		{3D2D9CF4-F705-477C-8C0A-E42763859F8D} = {6E25E408-5092-4B31-921F-531BD2F05244}
 		{D02989B1-606E-4BE9-B0EB-A5CCE7444FDA} = {FC295FAE-7AE8-4820-8828-51D2CB61B1D7}
-		{FD102138-7E22-400C-8D50-6C91DE246A7C} = {6E25E408-5092-4B31-921F-531BD2F05244}
+		{0CAEB5F5-CE5A-4BB3-8E4A-B9C5C8E2D5D3} = {6E25E408-5092-4B31-921F-531BD2F05244}
 	EndGlobalSection
 EndGlobal

@@ -1,7 +1,4 @@
 ﻿using Generator.Demo;
-using Entity1Builder = Generator.Demo.Entity1Builder;
-using Entity2Builder = Generator.Demo.Entity2Builder;
-using Entity3Builder = Generator.Demo.Entity3Builder;
 
 Entity1 entity1V1 = Entity1Builder.Minimal()
     .WithId(Guid.CreateVersion7)

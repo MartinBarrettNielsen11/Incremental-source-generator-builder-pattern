@@ -1,49 +1,49 @@
 namespace Generator.Demo;
 
 [Builder(typeof(Entity1))]
-public sealed partial class Entity1Builder
+public sealed partial class Entity1Builder : IEntityBuilder<Entity1Builder, Entity1>
 {
-    public static Entity1Builder Simple() => new Entity1Builder()
+    public static Entity1Builder Minimal() => new Entity1Builder()
         .WithId(Guid.NewGuid());
 
-    public static Entity1Builder Typical() => Simple()
+    public static Entity1Builder Typical() => Minimal()
         .WithEntity2List(new List<Entity2>
         {
             Entity2Builder.Typical().Build()
         });
+
+    public static Entity1Builder Committed() => Typical()
+        .WithCount(1)
+        .WithEntity3List(new List<Entity3>
+        {
+            Entity3Builder.Typical().Build()
+        });
 }
 
 [Builder(typeof(Entity2))]
-public sealed partial class Entity2Builder
+public sealed partial class Entity2Builder : IEntityBuilder<Entity2Builder, Entity2>
 {
-    public static Entity2Builder SimpleFunc() => new Entity2Builder()
-        //.WithId(Guid.NewGuid())
-        .WithId(() => Guid.NewGuid())
-        .WithVal("test");
-    
-    public static Entity2Builder SimpleDirect() => new Entity2Builder()
-        //.WithId(Guid.NewGuid())
-        .WithId(Guid.NewGuid)
-        .WithVal("test");
+    public static Entity2Builder Minimal() => new Entity2Builder();
 
-    public static Entity2Builder Typical() => SimpleDirect()
+    public static Entity2Builder Typical() => Minimal()
         .WithEntity3List(new List<Entity3>()
         {
-            Entity3Builder.Simple().Build()
+            Entity3Builder.Minimal().Build()
         });
 }
 
 
 [Builder(typeof(Entity3))]
-public sealed partial class Entity3Builder
+public sealed partial class Entity3Builder : IEntityBuilder<Entity3Builder, Entity3>
 {
     private Entity3Builder()
     {
-        DomainAssertionExtensions.AddDomainRule<Entity3>(_domainRules, predicate: e => e.MaximumPrice < e.MinimumPrice, 
+        _domainRules.AddDomainRule(
+            predicate: e => e.MaximumPrice < e.MinimumPrice, 
             errorMessage: "MaximumPrice must be larger than MinimumPrice");
     }
     
-    public static Entity3Builder Simple() =>  new Entity3Builder().WithMinimumPrice(10);
+    public static Entity3Builder Minimal() =>  new Entity3Builder().WithMinimumPrice(10);
 
-    public static Entity3Builder Typical() => Simple().WithMaximumPrice(20);
+    public static Entity3Builder Typical() => Minimal().WithMaximumPrice(20);
 }

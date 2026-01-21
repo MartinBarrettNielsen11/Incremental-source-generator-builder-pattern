@@ -1,0 +1,15 @@
+﻿#nullable enable
+#pragma warning disable CA1813, CA1019, IDE0065, IDE0034, IDE0055
+
+using System;
+
+namespace Generator;
+
+[System.CodeDom.Compiler.GeneratedCode("Generator", "v1")]
+[AttributeUsage(AttributeTargets.Class)]
+public sealed class BuilderAttribute(Type type) : Attribute
+{
+    public Type TargetType { get; } = type;
+}
+
+#pragma warning restore CA1813, CA1019, IDE0065, IDE0034, IDE0055

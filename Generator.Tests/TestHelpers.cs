@@ -79,7 +79,7 @@ internal sealed class TestHelpers
     }
     
     
-    private static async Task<GeneratorDriverRunResult> RunGeneratorAndAssertOutput<T>(
+    internal static async Task<GeneratorDriverRunResult> RunGeneratorAndAssertOutput<T>(
         CSharpCompilation compilation, string[] trackingNames) where T : IIncrementalGenerator, new()
     {
         ISourceGenerator generator = new T().AsSourceGenerator();
@@ -141,6 +141,13 @@ internal sealed class TestHelpers
         }
     }
     
+    
+    internal static string[] GetTrackingNames(Type trackingNamesType) => trackingNamesType
+        .GetFields()
+        .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
+        .Select(x => (string?)x.GetRawConstantValue()!)
+        .Where(x => !string.IsNullOrEmpty(x))
+        .ToArray();
     
     private static async Task AssertRunsEqual(
         ImmutableArray<IncrementalGeneratorRunStep> runSteps1,

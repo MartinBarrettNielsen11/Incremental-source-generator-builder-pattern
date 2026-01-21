@@ -5,7 +5,7 @@ namespace Generator;
 /// <summary>
 /// An immutable, equatable array. This is intended for facilitating comparison
 /// </summary>
-internal readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IReadOnlyCollection<T>
+public readonly struct EquatableArray<T> : IEquatable<EquatableArray<T>>, IReadOnlyCollection<T>
     where T : IEquatable<T>
 {
     private readonly T[]? _array;

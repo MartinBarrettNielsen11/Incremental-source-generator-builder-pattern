@@ -2,8 +2,7 @@ using System;
 using System.Collections.Generic;
 using Generator;
 
-namespace Incremental_source_generator_builder_pattern.Tests.TestData;
-
+namespace Generator.Tests.TestData;
 
 public abstract class Base
 {

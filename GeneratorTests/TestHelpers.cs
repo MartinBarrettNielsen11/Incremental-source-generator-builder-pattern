@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Assembly = System.Reflection.Assembly;
 
-namespace Generator.Tests;
+namespace GeneratorTests;
 
 internal static class TestHelpers
 {
@@ -32,7 +32,7 @@ internal static class TestHelpers
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new Generator();
+        var generator = new Generator.Generator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 

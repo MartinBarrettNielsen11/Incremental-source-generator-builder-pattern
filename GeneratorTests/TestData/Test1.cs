@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Generator;
 
-namespace Generator.Tests.TestData;
+namespace GeneratorTests.TestData;
 
 public abstract class Base
 {

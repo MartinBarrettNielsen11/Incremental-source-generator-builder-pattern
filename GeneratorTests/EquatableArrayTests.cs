@@ -1,4 +1,6 @@
-namespace Generator.Tests;
+using Generator;
+
+namespace GeneratorTests;
 
 public class EquatableArrayTests
 {

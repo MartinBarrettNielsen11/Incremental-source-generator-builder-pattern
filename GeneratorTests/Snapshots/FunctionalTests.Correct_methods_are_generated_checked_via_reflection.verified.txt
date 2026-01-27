@@ -1,0 +1,17 @@
+﻿[
+  EntityBuilder.WithEntityList(IList<Entity2> entityList),
+  EntityBuilder.WithEntityList(Func<IList<Entity2>> entityList),
+  EntityBuilder.WithId(long id),
+  EntityBuilder.WithId(Func<long> id),
+  EntityBuilder.WithModifiedByPostBuildAction(bool modifiedByPostBuildAction),
+  EntityBuilder.WithModifiedByPostBuildAction(Func<bool> modifiedByPostBuildAction),
+  EntityBuilder.WithName(string name),
+  EntityBuilder.WithName(Func<string> name),
+  EntityBuilder.WithProperty1(string property1),
+  EntityBuilder.WithProperty1(Func<string> property1),
+  EntityBuilder.Build(),
+  object.GetType(),
+  object.ToString(),
+  object.Equals(object obj),
+  object.GetHashCode()
+]

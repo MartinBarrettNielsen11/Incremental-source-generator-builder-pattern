@@ -1,0 +1,99 @@
+﻿#nullable enable
+#pragma warning disable IDE0055, IDE0008
+
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using Generator;
+
+namespace GeneratorTests.TestData;
+
+[System.CodeDom.Compiler.GeneratedCode("Generator", "v1")]
+public partial class EntityBuilder
+{
+    private Func<GeneratorTests.TestData.Entity> _factory = () => new();   
+    private readonly List<Action<GeneratorTests.TestData.Entity>> _domainRules = new();
+    private Func<IList<Entity2>>? _entityList;
+    private Func<long>? _id;
+    private Func<bool>? _modifiedByPostBuildAction;
+    private Func<string>? _name;
+    private Func<string>? _property1;
+
+    public EntityBuilder WithEntityList(IList<Entity2> @entityList)
+    {
+        return WithEntityList(() => @entityList);
+    }
+    public EntityBuilder WithEntityList(Func<IList<Entity2>> @entityList)
+    {
+        _entityList = @entityList;
+        return this;
+    }
+
+    public EntityBuilder WithId(long @id)
+    {
+        return WithId(() => @id);
+    }
+    public EntityBuilder WithId(Func<long> @id)
+    {
+        _id = @id;
+        return this;
+    }
+
+    public EntityBuilder WithModifiedByPostBuildAction(bool @modifiedByPostBuildAction)
+    {
+        return WithModifiedByPostBuildAction(() => @modifiedByPostBuildAction);
+    }
+    public EntityBuilder WithModifiedByPostBuildAction(Func<bool> @modifiedByPostBuildAction)
+    {
+        _modifiedByPostBuildAction = @modifiedByPostBuildAction;
+        return this;
+    }
+
+    public EntityBuilder WithName(string @name)
+    {
+        return WithName(() => @name);
+    }
+    public EntityBuilder WithName(Func<string> @name)
+    {
+        _name = @name;
+        return this;
+    }
+
+    public EntityBuilder WithProperty1(string @property1)
+    {
+        return WithProperty1(() => @property1);
+    }
+    public EntityBuilder WithProperty1(Func<string> @property1)
+    {
+        _property1 = @property1;
+        return this;
+    }
+    /// <summary> 
+    /// Returns configured instance of GeneratorTests.TestData.Entity 
+    /// </summary>
+    public GeneratorTests.TestData.Entity Build()
+    {
+        GeneratorTests.TestData.Entity instance = _factory();
+
+        if(_entityList is not null)
+            instance.EntityList = _entityList.Invoke();
+
+        if(_id is not null)
+            instance.Id = _id.Invoke();
+
+        if(_modifiedByPostBuildAction is not null)
+            instance.ModifiedByPostBuildAction = _modifiedByPostBuildAction.Invoke();
+
+        if(_name is not null)
+            instance.Name = _name.Invoke();
+
+        if(_property1 is not null)
+            instance.Property1 = _property1.Invoke();
+
+        _domainRules.ForEach(action => action(instance));
+
+        return instance;
+    }
+}
+
+#pragma warning restore IDE0055, IDE0008

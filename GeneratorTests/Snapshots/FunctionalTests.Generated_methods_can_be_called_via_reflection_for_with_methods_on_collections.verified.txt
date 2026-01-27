@@ -1,0 +1,13 @@
+﻿[
+  {
+    ModifiedByPostBuildAction: true,
+    EntityList: [
+      {
+        Property2: DK
+      },
+      {
+        Property2: US
+      }
+    ]
+  }
+]

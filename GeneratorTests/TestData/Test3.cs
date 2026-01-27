@@ -1,4 +1,4 @@
-namespace Generator.Tests.TestData;
+namespace GeneratorTests.TestData;
 
 public partial class Country
 {

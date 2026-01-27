@@ -1,4 +1,4 @@
-namespace Generator.Tests;
+namespace GeneratorTests;
 
 internal sealed class TrackingNames
 {

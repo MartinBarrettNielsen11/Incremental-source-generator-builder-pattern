@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using TUnit.Core.Helpers;
 
-namespace Generator.Tests;
+namespace GeneratorTests;
 
 public class FunctionalTests
 {
@@ -35,7 +35,7 @@ public class FunctionalTests
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         var generatedBuilderClass = generatorRunResult.GeneratedSources
-            .Single(gs => gs.HintName == "Generator_Tests_TestData_EntityBuilder.cs")
+            .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.cs")
             .SourceText
             .ToString();
         _settings.UseDirectory("Snapshots");
@@ -66,8 +66,8 @@ public class FunctionalTests
     [Test]
     public async Task Multiple_builders_with_same_name_in_different_namespaces_results_in_two_builders_being_generated()
     {
-        var builder1TypeName = "Generator.Tests.TestData.v1.TestEntityBuilder";
-        var builder2TypeName = "Generator.Tests.TestData.v2.TestEntityBuilder";
+        var builder1TypeName = "GeneratorTests.TestData.v1.TestEntityBuilder";
+        var builder2TypeName = "GeneratorTests.TestData.v2.TestEntityBuilder";
         
         Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(Example2)!;
         string source = SourceText.From(mrs).ToString();
@@ -76,7 +76,7 @@ public class FunctionalTests
         await Assert.That(runResult.GeneratedTrees.Length).IsEqualTo(4);
         
         await Assert.That(runResult.GeneratedTrees
-            .Any(gt => gt.FilePath == "Generator/BimServices.BuilderGenerator.BuilderGenerator/BimServices_BuilderGenerator_Tests_TestData_v1_TestEntityBuilder.cs")).IsTrue();
+            .Any(gt => gt.FilePath == "Generator/BimServices.BuilderGenerator.BuilderGenerator/BuilderGeneratorTests_TestData_v1_TestEntityBuilder.cs")).IsTrue();
         
         object? builder1 = compiledAssembly.CreateInstance(builder1TypeName);
         await Assert.That(builder1).IsNotNull();
@@ -101,7 +101,7 @@ public class FunctionalTests
     [Test]
     public async Task Correct_methods_are_generated_checked_via_reflection()
     {
-        var builderTypeName = "Generator.Tests.TestData.EntityBuilder";
+        var builderTypeName = "GeneratorTests.TestData.EntityBuilder";
         var sourceText = await TestHelpers.GetSourceText(Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
@@ -115,7 +115,7 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("BimServices.BuilderGenerator.Generator.Tests.TestData.EntityBuilder");
+        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -133,7 +133,7 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("BimServices.BuilderGenerator.Generator.Tests.TestData.EntityBuilder");
+        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -158,10 +158,10 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("Generator.Tests.TestData.EntityBuilder");
+        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
         var entity2Type = testBuilder!.GetType().Assembly
-            .GetType("BimServices.BuilderGenerator.Generator.Tests.TestData.Entity2");
+            .GetType("GeneratorTests.TestData.Entity2");
         
         var listType = typeof(List<>).MakeGenericType(entity2Type!);
         object countriesList = Activator.CreateInstance(listType)!;
@@ -211,7 +211,7 @@ public class FunctionalTests
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         var generatedBuilderClass = generatorRunResult.GeneratedSources
-            .Single(gs => gs.HintName == "Generator_Tests_TestData_EntityBuilder.cs")
+            .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.cs")
             .SourceText
             .ToString();
         _settings.UseDirectory("Snapshots");

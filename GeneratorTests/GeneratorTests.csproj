@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
-    <RootNamespace>Generator.Tests</RootNamespace>
+    <RootNamespace>GeneratorTests</RootNamespace>
 </PropertyGroup>
 
 <ItemGroup>

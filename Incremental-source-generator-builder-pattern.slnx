@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/docs/">
+    <File Path="DesignDecisions.md" />
+    <File Path="ReadMe.md" />
+  </Folder>
+  <Folder Name="/sample/">
+    <Project Path="Generator.Demo/Generator.Demo.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="Generator/Generator.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="Generator.Benchmarks/Generator.Benchmarks.csproj" />
+    <Project Path="GeneratorTests/GeneratorTests.csproj" />
+  </Folder>
+</Solution>

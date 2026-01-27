@@ -62,10 +62,10 @@ public sealed class Generator : IIncrementalGenerator
     }
     
     // Transform the syntax context
-    private static BuilderToGenerate? GetTypeToGenerate(GeneratorAttributeSyntaxContext syntaxContext, CancellationToken ct)
+    private static BuilderToGenerate? GetTypeToGenerate(
+        GeneratorAttributeSyntaxContext syntaxContext, 
+        CancellationToken ct)
     {
-        var stopwatch = Stopwatch.StartNew();
-        
         if (syntaxContext.TargetSymbol is not INamedTypeSymbol builderSymbol)
             return null;
 
@@ -89,8 +89,8 @@ public sealed class Generator : IIncrementalGenerator
         return new BuilderToGenerate(
             BuilderClassName: builderSymbol.Name,
             BuilderClassNamespace: builderSymbol.ContainingNamespace.ToString(),
+            BuilderClassAccessibility: builderSymbol.DeclaredAccessibility,
             Properties: properties,
-            TargetClassFullName: targetType.ToString(),
-            ElapsedTime: stopwatch.Elapsed);
+            TargetClassFullName: targetType.ToString());
     }
 }

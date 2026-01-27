@@ -9,7 +9,7 @@ using Assembly = System.Reflection.Assembly;
 
 namespace Generator.Tests;
 
-internal sealed class TestHelpers
+internal static class TestHelpers
 {
     internal static async Task<string> GetSourceText(string resourceName)
     {
@@ -21,7 +21,7 @@ internal sealed class TestHelpers
         ParseAndDriveResult(string source)
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
-
+        
         var references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
             .Select(a => MetadataReference.CreateFromFile(a.Location));
@@ -32,7 +32,7 @@ internal sealed class TestHelpers
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new global::Generator.Generator();
+        var generator = new Generator();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
@@ -80,7 +80,9 @@ internal sealed class TestHelpers
     
     
     internal static async Task<GeneratorDriverRunResult> RunGeneratorAndAssertOutput<T>(
-        CSharpCompilation compilation, string[] trackingNames) where T : IIncrementalGenerator, new()
+        CSharpCompilation compilation, 
+        string[] trackingNames) 
+        where T : IIncrementalGenerator, new()
     {
         ISourceGenerator generator = new T().AsSourceGenerator();
 

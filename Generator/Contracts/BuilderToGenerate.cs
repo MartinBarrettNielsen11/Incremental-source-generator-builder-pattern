@@ -8,9 +8,8 @@ namespace Generator;
 /// </summary> // note: maybe do some readonly stuff here like Andrew Lock?
 internal record struct BuilderToGenerate(
     string BuilderClassName,
+    Accessibility BuilderClassAccessibility,
     string BuilderClassNamespace,
     Properties Properties,
-    string TargetClassFullName,
-    TimeSpan ElapsedTime);
-    
+    string TargetClassFullName);
     

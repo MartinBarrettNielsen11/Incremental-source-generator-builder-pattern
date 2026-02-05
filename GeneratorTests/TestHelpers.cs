@@ -27,7 +27,7 @@ internal static class TestHelpers
             .Select(a => MetadataReference.CreateFromFile(a.Location));
 
         var compilation = CSharpCompilation.Create(
-            assemblyName: "Tests",
+            assemblyName: "GeneratorTests",
             syntaxTrees: [syntaxTree],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

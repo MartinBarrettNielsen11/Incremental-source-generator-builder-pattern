@@ -8,7 +8,6 @@ namespace GeneratorTests;
 
 public class FunctionalTests
 {
-    private static readonly string Example1 = $"{typeof(FunctionalTests).Namespace}.TestData.Test1.cs";
     private static readonly string Example2 = $"{typeof(FunctionalTests).Namespace}.TestData.Test2.cs";
     private static readonly string Example3 = $"{typeof(FunctionalTests).Namespace}.TestData.Test3.cs";
     
@@ -17,28 +16,28 @@ public class FunctionalTests
     [Test]
     public async Task BuilderAttributeUsage_IsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
 
         var generatedBuilderForAttribute = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "BuilderAttribute.g.cs").SourceText.ToString();
         
-        _settings.UseDirectory("Snapshots");
+        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
         await Verify(generatedBuilderForAttribute, _settings);
     }
     
     [Test]
     public async Task When_GeneratingBuilder_Then_BuilderClassIsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         var generatedBuilderClass = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.cs")
             .SourceText
             .ToString();
-        _settings.UseDirectory("Snapshots");
+        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
         await Verify(generatedBuilderClass, _settings);
     }
     
@@ -46,7 +45,7 @@ public class FunctionalTests
     [Test]
     public async Task NoDiagnosticsAreReported()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         ImmutableArray<Diagnostic> diagnostics = runResult.Diagnostics;
         await Assert.That(diagnostics.Length).IsEqualTo(0);
@@ -55,19 +54,10 @@ public class FunctionalTests
     // add test on "Test2" to show that only one attributeFor file is generated in case you produce two separate builder classes
     
     [Test]
-    public async Task OnlyOneBuilderClassIsGeneratedForDomainWithPartialKeyword()
-    {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
-        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
-        await Assert.That(syntaxTrees.Length).IsEqualTo(3);
-    }
-    
-    [Test]
     public async Task Multiple_builders_with_same_name_in_different_namespaces_results_in_two_builders_being_generated()
     {
-        var builder1TypeName = "GeneratorTests.TestData.v1.TestEntityBuilder";
-        var builder2TypeName = "GeneratorTests.TestData.v2.TestEntityBuilder";
+        var builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
+        var builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
         
         Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(Example2)!;
         string source = SourceText.From(mrs).ToString();
@@ -76,13 +66,13 @@ public class FunctionalTests
         await Assert.That(runResult.GeneratedTrees.Length).IsEqualTo(4);
         
         await Assert.That(runResult.GeneratedTrees
-            .Any(gt => gt.FilePath == "Generator/BimServices.BuilderGenerator.BuilderGenerator/BuilderGeneratorTests_TestData_v1_TestEntityBuilder.cs")).IsTrue();
+            .Any(gt => gt.FilePath == "Generator/Generator.Generator/GeneratorTests_TestData_Legacy_TestEntityBuilder.cs")).IsTrue();
         
         object? builder1 = compiledAssembly.CreateInstance(builder1TypeName);
         await Assert.That(builder1).IsNotNull();
         
         await Assert.That(runResult.GeneratedTrees
-            .Any(gt => gt.FilePath == "Generator/BimServices.BuilderGenerator.BuilderGenerator/BimServices_BuilderGenerator_Tests_TestData_v2_TestEntityBuilder.cs")).IsTrue();
+            .Any(gt => gt.FilePath == "Generator/Generator.Generator/GeneratorTests_TestData_TestEntityBuilder.cs")).IsTrue();
 
         object? builder2 = compiledAssembly.CreateInstance(builder2TypeName);
         
@@ -90,30 +80,21 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task Only_one_attribute_For_file_is_generated_when_generating_two_separate_builders()
-    {
-        var sourceText = await TestHelpers.GetSourceText(Example2);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
-        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
-        await Assert.That(syntaxTrees.Length).IsEqualTo(4);
-    }
-    
-    [Test]
     public async Task Correct_methods_are_generated_checked_via_reflection()
     {
         var builderTypeName = "GeneratorTests.TestData.EntityBuilder";
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
         var methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
-        _settings.UseDirectory("Snapshots");
+        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
         await Verify(methods, _settings);
     }
     
     [Test]
     public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_DIRECT_VERSION()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
@@ -131,7 +112,7 @@ public class FunctionalTests
     [Test]
     public async Task Generated_methods_can_be_called_via_reflection_for_with_methods2()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
@@ -148,7 +129,7 @@ public class FunctionalTests
         MethodInfo? buildMethod = testBuilder.GetType().GetMethod("Build");
         object? entity = buildMethod!.Invoke(testBuilder, null);
         
-        _settings.UseDirectory("Snapshots");
+        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
         await Verify(entity.ToObjectArray(), _settings);
     }
 
@@ -156,7 +137,7 @@ public class FunctionalTests
     [Test]
     public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_on_collections()
     {
-        var sourceText = await TestHelpers.GetSourceText(Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
@@ -202,6 +183,23 @@ public class FunctionalTests
         await Verify(entity.ToObjectArray(), _settings);
     }
     
+    [Test]
+    public async Task OnlyOneBuilderClassIsGeneratedForDomainWithPartialKeyword()
+    {
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
+        await Assert.That(syntaxTrees.Length).IsEqualTo(3);
+    }
+    
+    [Test]
+    public async Task Only_one_attribute_For_file_is_generated_when_generating_two_separate_builders()
+    {
+        var sourceText = await TestHelpers.GetSourceText(Example2);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
+        await Assert.That(syntaxTrees.Length).IsEqualTo(4);
+    }
     
     [Test]
     public async Task When_GeneratingBuilder_for_partial_domain_entity_then_everything_works_beautifully()
@@ -214,7 +212,7 @@ public class FunctionalTests
             .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.cs")
             .SourceText
             .ToString();
-        _settings.UseDirectory("Snapshots");
+        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
         await Verify(generatedBuilderClass, _settings);
     }
 }

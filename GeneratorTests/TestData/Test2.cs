@@ -1,6 +1,6 @@
 using Generator;
 
-namespace GeneratorTests.TestData.v1;
+namespace GeneratorTests.TestData.Legacy
 {
     public class TestEntity
     {
@@ -11,7 +11,7 @@ namespace GeneratorTests.TestData.v1;
     public partial class TestEntityBuilder { }
 }
 
-namespace GeneratorTests.TestData.v2;
+namespace GeneratorTests.TestData
 {
     public class TestEntity
     {

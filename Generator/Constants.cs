@@ -21,4 +21,6 @@ internal static class Constants
     internal const string FactoryName = "_factory";
     
     internal const string WithMethodPrefix = "With";
+    
+    internal const string GeneratedFileSuffix = ".g.cs";
 }

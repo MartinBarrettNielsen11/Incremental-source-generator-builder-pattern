@@ -1,0 +1,31 @@
+﻿#pragma warning disable IDE0055, IDE0008
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+
+namespace Generator;
+
+[System.CodeDom.Compiler.GeneratedCode("Generator", "v1")]
+public static class DomainAssertionExtensions
+{
+    /// <summary>
+    /// Adds a domain validation rule to be executed during the build phase.
+    /// </summary>
+    /// <param name="_domainRules">The list of post-build domain rules.</param>
+    /// <param name="predicate">A function that returns true when the entity violates a rule.</param>
+    /// <param name="errorMessage">The error message that will be thrown if the rule fails.</param>
+    public static void AddDomainRule<TEntity>(
+        this List<Action<TEntity>> _domainRules,
+        Func<TEntity, bool> predicate,
+        string errorMessage)
+    {
+        _domainRules.Add(e =>
+        {
+            if (predicate(e))
+                throw new InvalidOperationException(errorMessage);
+        });
+    }
+}
+
+#pragma warning restore IDE0055, IDE0008

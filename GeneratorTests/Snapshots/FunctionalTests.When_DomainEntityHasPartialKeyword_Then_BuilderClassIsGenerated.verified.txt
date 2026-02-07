@@ -1,0 +1,43 @@
+﻿#nullable enable
+#pragma warning disable IDE0055, IDE0008
+
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using Generator;
+
+namespace GeneratorTests.TestData;
+
+[System.CodeDom.Compiler.GeneratedCode("Generator", "v1")]
+public partial class EntityBuilder
+{
+    private Func<GeneratorTests.TestData.Country> _factory = () => new();   
+    private readonly List<Action<GeneratorTests.TestData.Country>> _domainRules = new();
+    private Func<string>? _countryName;
+
+    public EntityBuilder WithCountryName(string @countryName)
+    {
+        return WithCountryName(() => @countryName);
+    }
+    public EntityBuilder WithCountryName(Func<string> @countryName)
+    {
+        _countryName = @countryName;
+        return this;
+    }
+    /// <summary> 
+    /// Returns configured instance of GeneratorTests.TestData.Country 
+    /// </summary>
+    public GeneratorTests.TestData.Country Build()
+    {
+        GeneratorTests.TestData.Country instance = _factory();
+
+        if(_countryName is not null)
+            instance.CountryName = _countryName.Invoke();
+
+        _domainRules.ForEach(action => action(instance));
+
+        return instance;
+    }
+}
+
+#pragma warning restore IDE0055, IDE0008

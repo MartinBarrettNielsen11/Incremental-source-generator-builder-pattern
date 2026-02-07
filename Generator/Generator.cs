@@ -13,11 +13,11 @@ public sealed class Generator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(static context =>
         {
             context.AddSource(
-                $"{Constants.BuilderAttributeName}.g.cs", 
+                $"{Constants.BuilderAttributeName}{Constants.GeneratedFileSuffix}", 
                 SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
 
             context.AddSource(
-                $"{Constants.DomainAssertionExtensions}.g.cs", 
+                $"{Constants.DomainAssertionExtensions}{Constants.GeneratedFileSuffix}", 
                 SourceText.From(BuilderSourceEmitter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), Encoding.UTF8));
         });
         
@@ -44,7 +44,7 @@ public sealed class Generator : IIncrementalGenerator
 
                 // move extensions addition down here - and make tests for it
                 sourceProductionContext.AddSource(
-                    $"{builder.BuilderClassNamespace.Replace(".", "_")}_{builder.BuilderClassName}.cs",
+                    $"{builder.BuilderClassNamespace.Replace(".", "_")}_{builder.BuilderClassName}{Constants.GeneratedFileSuffix}",
                     SourceText.From(generatedOutput, Encoding.UTF8)
                 );
             }

@@ -1,3 +1,5 @@
+using Generator;
+
 namespace GeneratorTests.TestData;
 
 public partial class Country

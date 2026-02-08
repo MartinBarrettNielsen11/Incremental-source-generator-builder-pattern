@@ -1,7 +1,6 @@
-
 namespace Generator;
 
-internal static class BuilderSourceEmitter
+internal static class BuilderSourceWriter
 {
     internal static string GenerateBuilderAttribute(string builderAttributeName) =>
         $$$"""

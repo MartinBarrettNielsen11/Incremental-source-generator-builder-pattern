@@ -11,7 +11,7 @@ public class CachingTests
     [Test]
     public async Task IncrementalCachingMechanismIsUsedBetweenRuns()
     {
-        var input = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var input = await TestHelpers.GetSourceText(TestConstants.Example1);
         var stages = TestHelpers.GetTrackingNames(typeof(TrackingNames));
         
         var (diagnostics, output) = await GetGeneratedTrees<Generator.Generator>([input], stages);

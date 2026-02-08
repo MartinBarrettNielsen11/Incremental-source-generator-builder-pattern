@@ -14,11 +14,11 @@ public sealed class Generator : IIncrementalGenerator
         {
             context.AddSource(
                 $"{Constants.BuilderAttributeName}{Constants.GeneratedFileSuffix}", 
-                SourceText.From(BuilderSourceEmitter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
+                SourceText.From(BuilderSourceWriter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
 
             context.AddSource(
                 $"{Constants.DomainAssertionExtensions}{Constants.GeneratedFileSuffix}", 
-                SourceText.From(BuilderSourceEmitter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), Encoding.UTF8));
+                SourceText.From(BuilderSourceWriter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), Encoding.UTF8));
         });
         
         IncrementalValuesProvider<BuilderToGenerate> builders = context.SyntaxProvider
@@ -40,7 +40,7 @@ public sealed class Generator : IIncrementalGenerator
         {
             try
             {
-                var generatedOutput = BuilderSourceEmitter.GenerateBuilder(builder);
+                var generatedOutput = BuilderSourceWriter.GenerateBuilder(builder);
 
                 // move extensions addition down here - and make tests for it
                 sourceProductionContext.AddSource(

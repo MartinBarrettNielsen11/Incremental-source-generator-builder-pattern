@@ -13,28 +13,28 @@ public class FunctionalTests
     [Test]
     public async Task BuilderAttributeUsageIsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
 
         var generatedBuilderForAttribute = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "BuilderAttribute.g.cs").SourceText.ToString();
         
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
+        _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(generatedBuilderForAttribute, _settings);
     }
     
     [Test]
     public async Task DomainAssertionExtensionsIsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
 
         var generatedBuilderForAttribute = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "DomainAssertionExtensions.g.cs").SourceText.ToString();
         
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
+        _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(generatedBuilderForAttribute, _settings);
     }
     
@@ -42,14 +42,14 @@ public class FunctionalTests
     [Test]
     public async Task BuilderClassIsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         var generatedBuilderClass = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.g.cs")
             .SourceText
             .ToString();
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
+        _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(generatedBuilderClass, _settings);
     }
     
@@ -57,7 +57,7 @@ public class FunctionalTests
     [Test]
     public async Task NoDiagnosticsAreReported()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         ImmutableArray<Diagnostic> diagnostics = runResult.Diagnostics;
         await Assert.That(diagnostics.Length).IsEqualTo(0);
@@ -67,7 +67,7 @@ public class FunctionalTests
     [Test]
     public async Task OnlyOneBuilderIsGenerated_When_EntityHasPartialKeyword()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(3);
@@ -77,7 +77,7 @@ public class FunctionalTests
     [Test]
     public async Task When_DomainEntityHasPartialKeyword_Then_BuilderClassIsGenerated()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example3);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example3);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         
@@ -85,7 +85,7 @@ public class FunctionalTests
             .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.g.cs")
             .SourceText
             .ToString();
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
+        _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(generatedBuilderClass, _settings);
     }
     
@@ -96,7 +96,7 @@ public class FunctionalTests
         var builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
         var builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
         
-        Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(TestSourceFactoryConstants.Example2)!;
+        Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(TestConstants.Example2)!;
         string source = SourceText.From(mrs).ToString();
         var (runResult, compiledAssembly) = await TestHelpers.ParseAndDriveResult(source);
         
@@ -119,7 +119,7 @@ public class FunctionalTests
     [Test]
     public async Task OneAttributeForFileIsGenerated_When_GeneratingTwoBuilders()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example2);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example2);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(4);
@@ -129,18 +129,18 @@ public class FunctionalTests
     public async Task IntendedMethodsAreGenerated()
     {
         var builderTypeName = "GeneratorTests.TestData.EntityBuilder";
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
         var methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
+        _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(methods, _settings);
     }
     
     [Test]
     public async Task NewValueIsSet_When_InvokingWithMethod()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
@@ -159,7 +159,7 @@ public class FunctionalTests
     [Test]
     public async Task EntityIsConstructed_When_InvokingBuildMethod()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
@@ -208,7 +208,7 @@ public class FunctionalTests
     [Test]
     public async Task EntityCannotBeBuilt_When_InvokingWithMethodConflictsWithDomainRule()
     {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         

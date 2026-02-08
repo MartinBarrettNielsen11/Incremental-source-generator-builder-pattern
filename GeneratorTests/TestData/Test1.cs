@@ -29,5 +29,9 @@ public partial class EntityBuilder
     public EntityBuilder()
     {
         _domainRules.Add(e => { e.ModifiedByPostBuildAction = true; });
+        
+        _domainRules.AddDomainRule(
+            predicate: e => e.Name == "", 
+            errorMessage: "Name cannot be unspecified");
     }
 }

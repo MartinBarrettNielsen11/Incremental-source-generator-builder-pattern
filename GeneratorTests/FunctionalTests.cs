@@ -10,7 +10,6 @@ public class FunctionalTests
 {
     private VerifySettings _settings = new();
     
-    
     [Test]
     public async Task BuilderAttributeUsageIsGenerated()
     {
@@ -66,7 +65,7 @@ public class FunctionalTests
     
         
     [Test]
-    public async Task OnlyOneBuilderClassIsGeneratedForDomainWithPartialKeyword()
+    public async Task OnlyOneBuilderIsGenerated_When_EntityHasPartialKeyword()
     {
         var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
@@ -90,17 +89,9 @@ public class FunctionalTests
         await Verify(generatedBuilderClass, _settings);
     }
     
-    [Test]
-    public async Task Only_one_attribute_For_file_is_generated_when_generating_two_separate_builders()
-    {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example2);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
-        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
-        await Assert.That(syntaxTrees.Length).IsEqualTo(4);
-    }
     
     [Test]
-    public async Task Multiple_builders_with_same_name_in_different_namespaces_results_in_two_builders_being_generated()
+    public async Task TwoBuildersAreGenerated_When_TwoBuildersWithTheSameNameExistInDifferentNamespaces()
     {
         var builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
         var builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
@@ -126,7 +117,16 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task Correct_methods_are_generated_checked_via_reflection()
+    public async Task OneAttributeForFileIsGenerated_When_GeneratingTwoBuilders()
+    {
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example2);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
+        await Assert.That(syntaxTrees.Length).IsEqualTo(4);
+    }
+    
+    [Test]
+    public async Task IntendedMethodsAreGenerated()
     {
         var builderTypeName = "GeneratorTests.TestData.EntityBuilder";
         var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
@@ -138,7 +138,7 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_DIRECT_VERSION()
+    public async Task NewValueIsSet_When_InvokingWithMethod()
     {
         var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
@@ -154,34 +154,10 @@ public class FunctionalTests
         object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
         await Assert.That(testBuilder).IsEqualTo(res);
     }
-    
-    [Test]
-    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods2()
-    {
-        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
-        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
-        MethodInfo directGeneratedWithMethod = testBuilder!
-            .GetType()
-            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
-            .Where(m => m.Name.StartsWith("WithName"))
-            .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
-
-        var newName = "new-name";
-        
-        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
-        await Assert.That(testBuilder).IsEqualTo(res);
-        
-        MethodInfo? buildMethod = testBuilder.GetType().GetMethod("Build");
-        object? entity = buildMethod!.Invoke(testBuilder, null);
-        
-        _settings.UseDirectory(TestSourceFactoryConstants.VerifyDirectory);
-        await Verify(entity.ToObjectArray(), _settings);
-    }
 
     
     [Test]
-    public async Task Generated_methods_can_be_called_via_reflection_for_with_methods_on_collections()
+    public async Task EntityIsConstructed_When_InvokingBuildMethod()
     {
         var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
         var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
@@ -227,5 +203,38 @@ public class FunctionalTests
         
         _settings.UseDirectory("Snapshots");
         await Verify(entity.ToObjectArray(), _settings);
+    }
+    
+    [Test]
+    public async Task EntityCannotBeBuilt_When_InvokingWithMethodConflictsWithDomainRule()
+    {
+        var sourceText = await TestHelpers.GetSourceText(TestSourceFactoryConstants.Example1);
+        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
+        
+        MethodInfo directGeneratedWithMethod = testBuilder!
+            .GetType()
+            .GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Where(m => m.Name.StartsWith("WithName"))
+            .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
+
+        var buildMethod = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+            .Single(m => m.Name.StartsWith("Build"));
+        
+        const string newName = "";
+        
+        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
+        await Assert.That(testBuilder).IsEqualTo(res);
+
+        try    
+        {
+            buildMethod.Invoke(testBuilder, []);
+            Assert.Fail("Expected InvalidOperationException, but no exception was thrown.");
+        }
+        catch (TargetInvocationException ex)
+        {
+            await Assert.That(ex.InnerException).IsTypeOf<InvalidOperationException>();
+            await Assert.That(ex.InnerException!.Message).IsEqualTo("Name cannot be unspecified");
+        }
     }
 }

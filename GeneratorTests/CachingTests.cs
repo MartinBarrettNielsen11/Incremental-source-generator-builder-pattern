@@ -34,7 +34,7 @@ public class CachingTests
             .Concat([MetadataReference.CreateFromFile(typeof(T).Assembly.Location)]);
 
         CSharpCompilation compilation = CSharpCompilation.Create(
-            "BimServices.BuilderGenerator.Build",
+            "GeneratorTests",
             syntaxTrees,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

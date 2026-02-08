@@ -115,34 +115,31 @@ internal static class TestHelpers
         return runResult;
     }
     
-    
     private static async Task AssertRunsEqual(
         GeneratorDriverRunResult runResult1,
         GeneratorDriverRunResult runResult2,
         string[] trackingNames)
     {
-        var trackedSteps1 = GetTrackedSteps(runResult1, trackingNames);
-        var trackedSteps2 = GetTrackedSteps(runResult2, trackingNames);
+        var trackedSteps1 = runResult1.Results[0]
+            .TrackedSteps
+            .Where(step => trackingNames.Contains(step.Key))
+            .ToDictionary(x => x.Key, x => x.Value);
 
-        // both runs should have the same tracked steps
-        await Assert.That(trackedSteps1.Count).IsNotEqualTo(0).And.IsEqualTo(trackedSteps2.Count);
+        var trackedSteps2 = runResult2.Results[0]
+            .TrackedSteps
+            .Where(step => trackingNames.Contains(step.Key))
+            .ToDictionary(x => x.Key, x => x.Value);
 
+        await Assert.That(trackedSteps1.Count)
+            .IsNotEqualTo(0)
+            .And.IsEqualTo(trackedSteps2.Count);
+        
         foreach (var (trackingName, runSteps1) in trackedSteps1)
         {
             var runSteps2 = trackedSteps2[trackingName];
             await AssertRunsEqual(runSteps1, runSteps2, trackingName);
         }
-
-        static Dictionary<string, ImmutableArray<IncrementalGeneratorRunStep>> GetTrackedSteps(
-            GeneratorDriverRunResult runResult, string[] trackingNames)
-        {
-            return runResult.Results[0] // We are only running a single generator, so this is safe
-                .TrackedSteps
-                .Where(step => trackingNames.Contains(step.Key))
-                .ToDictionary(x => x.Key, x => x.Value);
-        }
     }
-    
     
     internal static string[] GetTrackingNames(Type trackingNamesType) => trackingNamesType
         .GetFields()

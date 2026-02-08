@@ -18,9 +18,9 @@ var site = buildingBuilder
 ## Installation
 Add the following project reference in consuming project:
 ```xml
-        <ProjectReference Include="..\BimServices.BuilderGenerator\BimServices.BuilderGenerator.csproj"
-                          OutputItemType = "Analyzer"
-                          ReferenceOutputAssembly="false"/>
+<ProjectReference Include="..\BimServices.BuilderGenerator\BimServices.BuilderGenerator.csproj"
+                  OutputItemType = "Analyzer"
+                  ReferenceOutputAssembly="false"/>
 ```
 
 

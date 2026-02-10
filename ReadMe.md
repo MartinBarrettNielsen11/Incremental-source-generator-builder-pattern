@@ -1,7 +1,7 @@
 # BuilderGenerator
 
 ## Introduction
-The BimServices.BuilderGenerator is a Roslyn powered incremental source generator.
+The BuilderGenerator is a Roslyn powered incremental source generator.
 Its purpose is to automate the generation of object builders for testing - using a fluent syntax
 It generates the repetitive part of creating builders, leaving only the more interesting, hand-curated parts for you to implement as partial classes.
 
@@ -18,7 +18,7 @@ var site = buildingBuilder
 ## Installation
 Add the following project reference in consuming project:
 ```xml
-<ProjectReference Include="..\BimServices.BuilderGenerator\BimServices.BuilderGenerator.csproj"
+<ProjectReference Include="..\Incremental-source-generator-builder-pattern\Generator.csproj"
                   OutputItemType = "Analyzer"
                   ReferenceOutputAssembly="false"/>
 ```
@@ -30,9 +30,9 @@ In the *Builders* folder, add a builder for the given entity.
 This is just a public partial class decorated with a *Builder* attribute that describes for which entity the builder should be created:
 
 ```csharp
-namespace BimServices.Tests.Data.Builders;
+namespace Generator.Tests.Data.Builders;
 
-using BimServices.BuilderGenerator;
+using Generator;
 using Domain.Site;
 
 [BuilderFor(typeof(Site))]
@@ -60,11 +60,11 @@ The following source code is emitted:
 
 ```csharp
 
-[System.CodeDom.Compiler.GeneratedCode("BimServices.BuilderGenerator", "v1")]
+[System.CodeDom.Compiler.GeneratedCode("Generator", "v1")]
 internal partial class SiteBuilder
 {
-    private Func<BimServices.BuilderGenerator.SampleTest.Site> _factory = () => new();   
-    private readonly List<Action<BimServices.BuilderGenerator.SampleTest.Site>> _domainRules = new();
+    private Func<Generator.SampleTest.Site> _factory = () => new();   
+    private readonly List<Action<Generator.SampleTest.Site>> _domainRules = new();
     private Func<DateTime>? _createdAt;
     private Func<long>? _id;
     private Func<string>? _name;
@@ -122,11 +122,11 @@ internal partial class SiteBuilder
     }
 
     /// <summary> 
-    /// Returns configured instance of BimServices.BuilderGenerator.Tests.Data.Site 
+    /// Returns configured instance of Generator.Tests.Data.Site 
     /// </summary>
-    public BimServices.BuilderGenerator.SampleTest.Site Build()
+    public Generator.SampleTest.Site Build()
     {
-        BimServices.BuilderGenerator.SampleTest.Site instance = _factory();
+        Generator.SampleTest.Site instance = _factory();
 
         if(_createdAt is not null)
             instance.CreatedAt = _createdAt.Invoke();

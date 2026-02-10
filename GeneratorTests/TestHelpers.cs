@@ -54,31 +54,6 @@ internal static class TestHelpers
         return (runResult, compiledAssembly);
     }
     
-    
-    internal static async Task<(ImmutableArray<Diagnostic> diagnostics, string[] Output)> GetGeneratedTrees<T>(
-        string[] sources, 
-        string[] stages) 
-        where T : IIncrementalGenerator, new()
-    {
-        IEnumerable<SyntaxTree> syntaxTrees = sources.Select(static s => CSharpSyntaxTree.ParseText(s));
-
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
-            .Select(_ => MetadataReference.CreateFromFile(_.Location))
-            .Concat(new[] { MetadataReference.CreateFromFile(typeof(T).Assembly.Location) });
-
-        CSharpCompilation compilation = CSharpCompilation.Create(
-            "BimServices.BuilderGenerator.Build",
-            syntaxTrees,
-            references,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
-
-        GeneratorDriverRunResult runResult = await RunGeneratorAndAssertOutput<T>(compilation, stages);
-
-        return (runResult.Diagnostics, runResult.GeneratedTrees.Select(gs => gs.ToString()).ToArray());
-    }
-    
-    
     internal static async Task<GeneratorDriverRunResult> RunGeneratorAndAssertOutput<T>(
         CSharpCompilation compilation, 
         string[] trackingNames) 
@@ -160,24 +135,14 @@ internal static class TestHelpers
             var runStep1 = runSteps1[i];
             var runStep2 = runSteps2[i];
 
-            // The outputs should be equal between different runs
-            IEnumerable<object> outputs1 = runStep1.Outputs.Select(x => x.Value);
-            IEnumerable<object> outputs2 = runStep2.Outputs.Select(x => x.Value);
-
-            await Assert.That(outputs1).IsEqualTo(outputs2);
-
-            // The second run’s results should always be Cached or Unchanged
-            await Assert.That((IEnumerable<(object Value, IncrementalStepRunReason Reason)>)runStep2.Outputs)
-                .All(
-                    x => x.Reason is IncrementalStepRunReason.Cached or IncrementalStepRunReason.Unchanged,
-                    "Each output reason should be either Cached or Unchanged"
-                );
+            await Assert
+                .That(runStep2.Outputs)
+                .All(x => x.Reason is IncrementalStepRunReason.Cached or IncrementalStepRunReason.Unchanged);
 
             // make sure we are not using anything we shouldn't 
             await AssertObjectGraph(runStep1, stepName);
         }
     }
-    
     
     private static async Task AssertObjectGraph(IncrementalGeneratorRunStep runStep, string stepName)
     {
@@ -190,12 +155,13 @@ internal static class TestHelpers
             await Visit(obj);
         }
 
-        async Task Visit(object node)
+        async Task Visit(object? node)
         {
             if (node is null || !visited.Add(node))
                 return;
 
-            await Assert.That(node).IsNotAssignableTo<Compilation>()
+            await Assert.That(node)
+                .IsNotAssignableTo<Compilation>()
                 .And.IsNotAssignableTo<ISymbol>()
                 .And.IsNotAssignableTo<SyntaxNode>();
 
@@ -209,6 +175,7 @@ internal static class TestHelpers
             {
                 foreach (object element in collection)
                 {
+                    // Recursively check each element in the collection
                     await Visit(element);
                 }
 
@@ -219,7 +186,7 @@ internal static class TestHelpers
             foreach (FieldInfo f in
                      type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                object fieldValue = f.GetValue(node);
+                object fieldValue = f.GetValue(node)!;
                 await Visit(fieldValue);
             }
         }

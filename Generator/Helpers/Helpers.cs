@@ -27,16 +27,26 @@ internal static class Helpers
     }
     
 
-    private static void CollectSymbols(ITypeSymbol type, INamedTypeSymbol typeICollection, List<IPropertySymbol>? collection, List<IPropertySymbol>? normal)
+    private static void CollectSymbols(ITypeSymbol type, 
+                                       INamedTypeSymbol typeICollection, 
+                                       List<IPropertySymbol>? collection, 
+                                       List<IPropertySymbol>? normal)
     {
         foreach (var property in type.GetMembers().OfType<IPropertySymbol>())
         {
-            bool isCollection = property.SetMethod is null &&
+            var isCollection = property.SetMethod is null &&
                                 ImplementsInterface(property.Type, typeICollection);
-            if (isCollection)
+            
+            if (isCollection && collection is not null)
+            {
                 collection.Add(property);
-            else if (property.SetMethod is not null && property.SetMethod.DeclaredAccessibility == Accessibility.Public)
+            }
+            else if (property.SetMethod is not null && 
+                     property.SetMethod.DeclaredAccessibility == Accessibility.Public &&
+                     normal is not null)
+            {
                 normal.Add(property);
+            }
         }
 
         if (type.BaseType is { } baseType)

@@ -13,12 +13,16 @@ public sealed class Generator : IIncrementalGenerator
         context.RegisterPostInitializationOutput(static context =>
         {
             context.AddSource(
-                $"{Constants.BuilderAttributeName}{Constants.GeneratedFileSuffix}", 
-                SourceText.From(BuilderSourceWriter.GenerateBuilderAttribute(Constants.BuilderAttributeName), Encoding.UTF8));
+                hintName: $"{Constants.BuilderAttributeName}{Constants.GeneratedFileSuffix}", 
+                sourceText: SourceText.From(
+                    BuilderSourceWriter.GenerateBuilderAttribute(Constants.BuilderAttributeName), 
+                    Encoding.UTF8));
 
             context.AddSource(
-                $"{Constants.DomainAssertionExtensions}{Constants.GeneratedFileSuffix}", 
-                SourceText.From(BuilderSourceWriter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), Encoding.UTF8));
+                hintName: $"{Constants.DomainAssertionExtensions}{Constants.GeneratedFileSuffix}", 
+                sourceText: SourceText.From(
+                    BuilderSourceWriter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), 
+                    Encoding.UTF8));
         });
         
         IncrementalValuesProvider<BuilderToGenerate> builders = context.SyntaxProvider
@@ -78,7 +82,6 @@ public sealed class Generator : IIncrementalGenerator
         if (attribute.ConstructorArguments[0].Value is not INamedTypeSymbol targetType)
             return null;
 
-        // short-circuit the transformation if additional changes are detected
         ct.ThrowIfCancellationRequested();
 
         INamedTypeSymbol? typeICollection = syntaxContext.SemanticModel.Compilation

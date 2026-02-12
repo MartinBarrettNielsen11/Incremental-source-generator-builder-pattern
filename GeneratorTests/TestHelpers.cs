@@ -22,17 +22,17 @@ internal static class TestHelpers
     {
         SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
         
-        var references = AppDomain.CurrentDomain.GetAssemblies()
+        IEnumerable<PortableExecutableReference> references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
             .Select(a => MetadataReference.CreateFromFile(a.Location));
 
-        var compilation = CSharpCompilation.Create(
+        CSharpCompilation compilation = CSharpCompilation.Create(
             assemblyName: "GeneratorTests",
             syntaxTrees: [syntaxTree],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        var generator = new Generator.Generator();
+        Generator.Generator generator = new();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
@@ -40,7 +40,7 @@ internal static class TestHelpers
             out ImmutableArray<Diagnostic> diagnostics);
 
         // Load assembly into memory
-        using var ms = new MemoryStream();
+        using MemoryStream ms = new MemoryStream();
         EmitResult emitResult = outputCompilation.Emit(ms);
 
         await Assert.That(emitResult.Success).IsTrue();
@@ -49,7 +49,7 @@ internal static class TestHelpers
 
         ms.Seek(0, SeekOrigin.Begin);
         Assembly compiledAssembly = Assembly.Load(ms.ToArray());
-        var runResult = driver.GetRunResult();
+        GeneratorDriverRunResult runResult = driver.GetRunResult();
 
         return (runResult, compiledAssembly);
     }
@@ -62,14 +62,14 @@ internal static class TestHelpers
         ISourceGenerator generator = new T().AsSourceGenerator();
 
         // Tell the driver to track all the incremental generator outputs
-        var opts = new GeneratorDriverOptions(
+        GeneratorDriverOptions opts = new GeneratorDriverOptions(
             disabledOutputs: IncrementalGeneratorOutputKind.None,
             trackIncrementalGeneratorSteps: true);
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create([generator], driverOptions: opts);
 
         // Create a clone of the compilation that we will use later
-        var clone = compilation.Clone();
+        CSharpCompilation clone = compilation.Clone();
 
         // Do the initial run
         driver = driver.RunGenerators(compilation);
@@ -95,12 +95,12 @@ internal static class TestHelpers
         GeneratorDriverRunResult runResult2,
         string[] trackingNames)
     {
-        var trackedSteps1 = runResult1.Results[0]
+        Dictionary<string, ImmutableArray<IncrementalGeneratorRunStep>> trackedSteps1 = runResult1.Results[0]
             .TrackedSteps
             .Where(step => trackingNames.Contains(step.Key))
             .ToDictionary(x => x.Key, x => x.Value);
 
-        var trackedSteps2 = runResult2.Results[0]
+        Dictionary<string, ImmutableArray<IncrementalGeneratorRunStep>> trackedSteps2 = runResult2.Results[0]
             .TrackedSteps
             .Where(step => trackingNames.Contains(step.Key))
             .ToDictionary(x => x.Key, x => x.Value);
@@ -111,14 +111,14 @@ internal static class TestHelpers
         
         foreach (var (trackingName, runSteps1) in trackedSteps1)
         {
-            var runSteps2 = trackedSteps2[trackingName];
+            ImmutableArray<IncrementalGeneratorRunStep> runSteps2 = trackedSteps2[trackingName];
             await AssertRunsEqual(runSteps1, runSteps2, trackingName);
         }
     }
     
     internal static string[] GetTrackingNames(Type trackingNamesType) => trackingNamesType
         .GetFields()
-        .Where(f => f.IsLiteral && !f.IsInitOnly && f.FieldType == typeof(string))
+        .Where(f => f is { IsLiteral: true, IsInitOnly: false } && f.FieldType == typeof(string))
         .Select(x => (string?)x.GetRawConstantValue()!)
         .Where(x => !string.IsNullOrEmpty(x))
         .ToArray();
@@ -132,8 +132,8 @@ internal static class TestHelpers
 
         for (var i = 0; i < runSteps1.Length; i++)
         {
-            var runStep1 = runSteps1[i];
-            var runStep2 = runSteps2[i];
+            IncrementalGeneratorRunStep runStep1 = runSteps1[i];
+            IncrementalGeneratorRunStep runStep2 = runSteps2[i];
 
             await Assert
                 .That(runStep2.Outputs)
@@ -148,7 +148,7 @@ internal static class TestHelpers
     {
         // Including the stepName in error messages to make it easy to isolate issues
         var because = $"{stepName} shouldn't contain banned symbols";
-        var visited = new HashSet<object>();
+        HashSet<object> visited = new();
 
         foreach (var (obj, _) in runStep.Outputs)
         {
@@ -173,7 +173,7 @@ internal static class TestHelpers
             // If the object is a collection, check each of the values
             if (node is IEnumerable collection and not string)
             {
-                foreach (object element in collection)
+                foreach (var element in collection)
                 {
                     // Recursively check each element in the collection
                     await Visit(element);
@@ -186,7 +186,7 @@ internal static class TestHelpers
             foreach (FieldInfo f in
                      type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
             {
-                object fieldValue = f.GetValue(node)!;
+                var fieldValue = f.GetValue(node)!;
                 await Visit(fieldValue);
             }
         }

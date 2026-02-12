@@ -6,7 +6,7 @@ namespace Generator;
 #pragma warning disable RS1038
 [Generator(LanguageNames.CSharp)]
 #pragma warning restore RS1038
-public sealed class Generator : IIncrementalGenerator
+internal sealed class Generator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {

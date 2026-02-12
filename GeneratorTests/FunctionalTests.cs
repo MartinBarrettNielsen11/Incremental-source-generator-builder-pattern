@@ -93,25 +93,25 @@ public class FunctionalTests
     [Test]
     public async Task TwoBuildersAreGenerated_When_TwoBuildersWithTheSameNameExistInDifferentNamespaces()
     {
-        var builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
-        var builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
+        const string builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
+        const string builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
         
         Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(TestConstants.Example2)!;
-        string source = SourceText.From(mrs).ToString();
-        var (runResult, compiledAssembly) = await TestHelpers.ParseAndDriveResult(source);
+        var source = SourceText.From(mrs).ToString();
+        (GeneratorDriverRunResult runResult, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(source);
         
         await Assert.That(runResult.GeneratedTrees.Length).IsEqualTo(4);
         
         await Assert.That(runResult.GeneratedTrees
             .Any(gt => gt.FilePath == "Generator/Generator.Generator/GeneratorTests_TestData_Legacy_TestEntityBuilder.g.cs")).IsTrue();
         
-        object? builder1 = compiledAssembly.CreateInstance(builder1TypeName);
+        var builder1 = compiledAssembly.CreateInstance(builder1TypeName);
         await Assert.That(builder1).IsNotNull();
         
         await Assert.That(runResult.GeneratedTrees
             .Any(gt => gt.FilePath == "Generator/Generator.Generator/GeneratorTests_TestData_TestEntityBuilder.g.cs")).IsTrue();
 
-        object? builder2 = compiledAssembly.CreateInstance(builder2TypeName);
+        var builder2 = compiledAssembly.CreateInstance(builder2TypeName);
         
         await Assert.That(builder2).IsNotNull();
     }
@@ -128,11 +128,11 @@ public class FunctionalTests
     [Test]
     public async Task IntendedMethodsAreGenerated()
     {
-        var builderTypeName = "GeneratorTests.TestData.EntityBuilder";
+        const string builderTypeName = "GeneratorTests.TestData.EntityBuilder";
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
-        var methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
+        MethodInfo[] methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
         _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(methods, _settings);
     }
@@ -141,17 +141,17 @@ public class FunctionalTests
     public async Task NewValueIsSet_When_InvokingWithMethod()
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Where(m => m.Name.StartsWith("WithName"))
             .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
 
-        var newName = "new-name";
+        const string newName = "new-name";
         
-        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
+        var res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
         await Assert.That(testBuilder).IsEqualTo(res);
     }
 
@@ -160,21 +160,21 @@ public class FunctionalTests
     public async Task EntityIsConstructed_When_InvokingBuildMethod()
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
-        var entity2Type = testBuilder!.GetType().Assembly
+        Type? entity2Type = testBuilder!.GetType().Assembly
             .GetType("GeneratorTests.TestData.Entity2");
         
-        var listType = typeof(List<>).MakeGenericType(entity2Type!);
-        object countriesList = Activator.CreateInstance(listType)!;
+        Type listType = typeof(List<>).MakeGenericType(entity2Type!);
+        var countriesList = Activator.CreateInstance(listType)!;
 
         PropertyInfo? piCountryName = entity2Type!.GetProperty("Property2");
 
-        object? countryDk = Activator.CreateInstance(entity2Type);
+        var countryDk = Activator.CreateInstance(entity2Type);
         piCountryName!.SetValue(countryDk, "DK");
 
-        object? countryUs = Activator.CreateInstance(entity2Type);
+        var countryUs = Activator.CreateInstance(entity2Type);
         piCountryName.SetValue(countryUs, "US");
 
         listType.InvokeMember(
@@ -194,12 +194,12 @@ public class FunctionalTests
         MethodInfo? miWithEntityList = testBuilder.GetType()
             .GetMethod("WithEntityList", [listType]);
 
-        object? resultBuilder = miWithEntityList!.Invoke(testBuilder, [countriesList]);
+        var resultBuilder = miWithEntityList!.Invoke(testBuilder, [countriesList]);
 
         await Assert.That(resultBuilder).IsEquivalentTo(testBuilder);
         
         MethodInfo? buildMethod = testBuilder.GetType().GetMethod("Build");
-        object? entity = buildMethod!.Invoke(testBuilder, null);
+        var entity = buildMethod!.Invoke(testBuilder, null);
         
         _settings.UseDirectory("Snapshots");
         await Verify(entity.ToObjectArray(), _settings);
@@ -209,8 +209,8 @@ public class FunctionalTests
     public async Task EntityCannotBeBuilt_When_InvokingWithMethodConflictsWithDomainRule()
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (_, compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        object? testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
@@ -218,12 +218,12 @@ public class FunctionalTests
             .Where(m => m.Name.StartsWith("WithName"))
             .Single(m => m.GetParameters()[0].ParameterType == typeof(string));
 
-        var buildMethod = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
+        MethodInfo buildMethod = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance)
             .Single(m => m.Name.StartsWith("Build"));
         
         const string newName = "";
         
-        object? res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
+        var res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
         await Assert.That(testBuilder).IsEqualTo(res);
 
         try    

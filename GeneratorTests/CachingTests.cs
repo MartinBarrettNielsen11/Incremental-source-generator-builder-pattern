@@ -28,9 +28,9 @@ public class CachingTests
     {
         IEnumerable<SyntaxTree> syntaxTrees = sources.Select(static s => CSharpSyntaxTree.ParseText(s));
 
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(_ => !_.IsDynamic && !string.IsNullOrWhiteSpace(_.Location))
-            .Select(_ => MetadataReference.CreateFromFile(_.Location))
+        IEnumerable<PortableExecutableReference> references = AppDomain.CurrentDomain.GetAssemblies()
+            .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+            .Select(a => MetadataReference.CreateFromFile(a.Location))
             .Concat([MetadataReference.CreateFromFile(typeof(T).Assembly.Location)]);
 
         CSharpCompilation compilation = CSharpCompilation.Create(

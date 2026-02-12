@@ -18,5 +18,10 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="GeneratorTests" />
+        <InternalsVisibleTo Include="Generator.Benchmarks"/>
+    </ItemGroup>
     
 </Project>

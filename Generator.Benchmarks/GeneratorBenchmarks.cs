@@ -1,3 +1,4 @@
+using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Order;
 using Microsoft.CodeAnalysis;
@@ -40,15 +41,15 @@ public class GeneratorBenchmarks
     [Benchmark]
     public GeneratorDriverRunResult Then_the_expected_output_is_generated()
     {
-        var generator = new global::Generator.Generator();
-        var syntaxTree = CSharpSyntaxTree.ParseText(_citizenInput);
-        var compilation = CSharpCompilation.Create(
+        Generator generator = new();
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(_citizenInput);
+        CSharpCompilation compilation = CSharpCompilation.Create(
             nameof(Then_the_expected_output_is_generated),
             [syntaxTree],
             [MetadataReference.CreateFromFile(typeof(object).Assembly.Location)]);
         
-        var driver = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation);
-        var result = driver.GetRunResult();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation);
+        GeneratorDriverRunResult result = driver.GetRunResult();
 
         return result;
     }
@@ -56,28 +57,28 @@ public class GeneratorBenchmarks
     [Benchmark]
     public GeneratorDriverRunResult Then_the_output_is_generated_big_version()
     {
-        var generator = new global::Generator.Generator();
-        var syntaxTree1 = CSharpSyntaxTree.ParseText(_entitiesInput);
-        var syntaxTree2 = CSharpSyntaxTree.ParseText(_buildersInput);
-        var compilation = CSharpCompilation.Create(
+        Generator generator = new();
+        SyntaxTree syntaxTree1 = CSharpSyntaxTree.ParseText(_entitiesInput);
+        SyntaxTree syntaxTree2 = CSharpSyntaxTree.ParseText(_buildersInput);
+        CSharpCompilation compilation = CSharpCompilation.Create(
             nameof(Then_the_output_is_generated_big_version),
             [syntaxTree1, syntaxTree2],
             [MetadataReference.CreateFromFile(typeof(object).Assembly.Location)]);
         
-        var driver = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation);
-        var result = driver.GetRunResult();
+        GeneratorDriver driver = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation);
+        GeneratorDriverRunResult result = driver.GetRunResult();
 
         return result;
     }
     
     private static string GetResourceAsString(string resourceName)  
     {
-        var assembly = typeof(GeneratorBenchmarks).Assembly;
+        Assembly assembly = typeof(GeneratorBenchmarks).Assembly;
         var manifestResourceNames = assembly.GetManifestResourceNames();  
         resourceName = manifestResourceNames.Single(x => x.Equals($"Generator.Benchmarks.{resourceName}", StringComparison.OrdinalIgnoreCase));
 
-        using var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Resource '{resourceName}' not found.");  
-        using var reader = new StreamReader(stream);  
+        using Stream stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException($"Resource '{resourceName}' not found.");  
+        using StreamReader reader = new(stream);  
 
         return reader.ReadToEnd();  
     }  

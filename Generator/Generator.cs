@@ -30,8 +30,6 @@ public sealed class Generator : IIncrementalGenerator
                 $"{typeof(BuilderToGenerate).Namespace}.{Constants.BuilderAttributeName}",
                 // Performs a first-pass filtering of syntax nodes that could possibly represent a builder class
                 // we just return true - as it's guaranteed to always be a node decorated with that attribute!
-                
-                // Apply global predicate - as it is guarenteed to always be a node decorated with the Build attribute
                 predicate: static (_, _) => true,
                 transform: static (generatorAttributeSyntaxContext, ct) => 
                     GetTypeToGenerate(generatorAttributeSyntaxContext, ct))

@@ -6,6 +6,9 @@
   <Folder Name="/sample/">
     <Project Path="Generator.Demo/Generator.Demo.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="Generator/Generator.csproj" />
   </Folder>

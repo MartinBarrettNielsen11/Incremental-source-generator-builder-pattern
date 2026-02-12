@@ -58,16 +58,15 @@ internal static class BuilderSourceWriter
 
     internal static string GenerateBuilder(in BuilderToGenerate builder)
     {
-
         var estimated = EstimateInitialCapacity(builder);
 
-        var conservativeStackLimit = 2048;
+        const int conservativeStackLimit = 2048;
 
         Span<char> initial = estimated < conservativeStackLimit
             ? stackalloc char[estimated]
             : stackalloc char[conservativeStackLimit];
 
-        var vsb = new ValueStringBuilder(initial);
+        ValueStringBuilder vsb = new ValueStringBuilder(initial);
 
         GenerateHeader(ref vsb, builder);
         GenerateFields(ref vsb, builder);
@@ -109,7 +108,7 @@ internal static class BuilderSourceWriter
                      """.AsSpan());
         vsb.Append("\n".AsSpan());
         
-        foreach (var prop in builder.Properties.AllProperties)
+        foreach (PropertyInfoModel prop in builder.Properties.AllProperties)
         {
             var type = prop.TypeName;
             var camelCase = char.ToLowerInvariant(prop.Name[0]) + prop.Name.Substring(1);
@@ -119,7 +118,7 @@ internal static class BuilderSourceWriter
 
     private static void GenerateWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
-        foreach (var prop in builder.Properties.AllProperties)
+        foreach (PropertyInfoModel prop in builder.Properties.AllProperties)
         {
             var type = prop.TypeName;
             var name = prop.Name;
@@ -155,7 +154,7 @@ internal static class BuilderSourceWriter
 
                """.AsSpan());
 
-        foreach (var prop in builder.Properties.Normal)
+        foreach (PropertyInfoModel prop in builder.Properties.Normal)
         {
             var name = prop.Name;
             var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
@@ -169,7 +168,7 @@ internal static class BuilderSourceWriter
                    """.AsSpan());
         }
 
-        foreach (var prop in builder.Properties.Collection)
+        foreach (PropertyInfoModel prop in builder.Properties.Collection)
         {
             var name = prop.Name;
             var camelCase = char.ToLowerInvariant(name[0]) + name.Substring(1);
@@ -209,14 +208,14 @@ internal static class BuilderSourceWriter
         const int footer = 100;
         const double padding = 1.05;
 
-        var allProps = builder.Properties.AllProperties;
+        List<PropertyInfoModel> allProps = builder.Properties.AllProperties;
         var collectionCount = builder.Properties.Collection.Count;
 
         // Compute averages
         var totalNameLen = 0;
         var totalTypeLen = 0;
 
-        foreach (var p in allProps)
+        foreach (PropertyInfoModel p in allProps)
         {
             totalNameLen += p.Name.Length;
             totalTypeLen += p.TypeName.Length;
@@ -227,7 +226,7 @@ internal static class BuilderSourceWriter
 
         var perPropertyCost = 310 + avgNameLen + avgTypeLen;
 
-        var total = header + (allProps.Count * perPropertyCost) + (collectionCount * 150) + footer;
+        var total = header + allProps.Count * perPropertyCost + collectionCount * 150 + footer;
 
         return (int)(total * padding);
     }

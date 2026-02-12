@@ -28,11 +28,12 @@ internal ref struct ValueStringBuilder(Span<char> initialBuffer)
         // double the buffer each time unless the needed input is even larger
         var minimumCapacity = (int)Math.Max((uint)(_pos + capacity), (uint)_chars.Length * 2);
         
-        char[] poolArray = ArrayPool<char>.Shared.Rent(minimumCapacity);
+        var poolArray = ArrayPool<char>.Shared.Rent(minimumCapacity);
         _chars.Slice(0, _pos).CopyTo(poolArray);
 
-        char[]? toReturn = _arrayToReturnToPool;
+        var toReturn = _arrayToReturnToPool;
         _chars = _arrayToReturnToPool = poolArray;
+        
         if (toReturn is not null)
             ArrayPool<char>.Shared.Return(toReturn);
     }
@@ -41,8 +42,11 @@ internal ref struct ValueStringBuilder(Span<char> initialBuffer)
     private void Append(char ch)
     {
         var pos = _pos;
+        
         if ((uint)pos >= (uint)_chars.Length)
+        {
             GrowAndAppend(ch);
+        }
         else
         {
             _chars[pos] = ch;
@@ -60,10 +64,12 @@ internal ref struct ValueStringBuilder(Span<char> initialBuffer)
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void Dispose()
     {
-        char[]? toReturn = _arrayToReturnToPool;
+        var toReturn = _arrayToReturnToPool;
         this = default;
         if (toReturn is not null)
+        {
             ArrayPool<char>.Shared.Return(toReturn);
+        }
     }
     
     public override string ToString()

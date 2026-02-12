@@ -6,10 +6,10 @@ internal struct HashCode
 
     public void Add<T>(T value)
     {
-        int h = value?.GetHashCode() ?? 0;
+        var h = value?.GetHashCode() ?? 0;
         unchecked
         {
-            _value = (_value * 31) + h;
+            _value = _value * 31 + h;
         }
     }
 

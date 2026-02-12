@@ -20,7 +20,7 @@ Entity1 entity1V2 = Entity1Builder.Committed()
 
 Console.WriteLine(entity1V2);
 
-var entityV2NoBuild = Entity2Builder.Typical()
+Entity2 entityV2NoBuild = Entity2Builder.Typical()
     .WithEntity3List(new List<Entity3>()
     {
         Entity3Builder.Minimal().WithMaximumPrice(5).Build()

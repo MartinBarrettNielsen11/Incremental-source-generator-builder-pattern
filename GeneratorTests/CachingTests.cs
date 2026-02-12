@@ -14,7 +14,7 @@ public class CachingTests
         var input = await TestHelpers.GetSourceText(TestConstants.Example1);
         var stages = TestHelpers.GetTrackingNames(typeof(TrackingNames));
         
-        var (diagnostics, output) = await GetGeneratedTrees<Generator.Generator>([input], stages);
+        (ImmutableArray<Diagnostic> diagnostics, var output) = await GetGeneratedTrees<Generator.Generator>([input], stages);
 
         await Assert.That(diagnostics.Length).IsEqualTo(0);
         await Assert.That(output.Length).IsGreaterThan(0);

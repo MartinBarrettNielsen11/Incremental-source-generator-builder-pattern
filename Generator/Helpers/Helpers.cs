@@ -6,17 +6,17 @@ internal static class Helpers
         INamedTypeSymbol typeICollection,
         ITypeSymbol namedTypeSymbol)
     {
-        var normalSymbols = new List<IPropertySymbol>();
-        var collectionSymbols = new List<IPropertySymbol>();
+        List<IPropertySymbol> normalSymbols = [];
+        List<IPropertySymbol> collectionSymbols = [];
 
         CollectSymbols(namedTypeSymbol, typeICollection, collectionSymbols, normalSymbols);
 
-        var normal = normalSymbols
+        PropertyInfoModel[] normal = normalSymbols
             .OrderBy(p => p.Name)
             .Select(p => ToModel(p, isCollection: false))
             .ToArray();
 
-        var collection = collectionSymbols
+        PropertyInfoModel[] collection = collectionSymbols
             .OrderBy(p => p.Name)
             .Select(p => ToModel(p, isCollection: true))
             .ToArray();
@@ -32,7 +32,7 @@ internal static class Helpers
                                        List<IPropertySymbol>? collection, 
                                        List<IPropertySymbol>? normal)
     {
-        foreach (var property in type.GetMembers().OfType<IPropertySymbol>())
+        foreach (IPropertySymbol? property in type.GetMembers().OfType<IPropertySymbol>())
         {
             var isCollection = property.SetMethod is null &&
                                 ImplementsInterface(property.Type, typeICollection);

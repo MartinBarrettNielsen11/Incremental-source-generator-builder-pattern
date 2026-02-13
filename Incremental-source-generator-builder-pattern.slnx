@@ -8,6 +8,9 @@
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="global.json" />
+    <File Path="Incremental-source-generator-builder-pattern.sln.DotSettings.user" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="Generator/Generator.csproj" />

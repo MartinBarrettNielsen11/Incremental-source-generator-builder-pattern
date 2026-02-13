@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Generator.FunctionalTests;
+namespace GeneratorTests;
 
 // Pertains to the incremental source generator pipeline, which memoizes results
 // at each transform/filter stage to avoid redundant work when inputs don’t change.
@@ -14,7 +14,7 @@ public class CachingTests
         var input = await TestHelpers.GetSourceText(TestConstants.Example1);
         var stages = TestHelpers.GetTrackingNames(typeof(TrackingNames));
         
-        (ImmutableArray<Diagnostic> diagnostics, var output) = await GetGeneratedTrees<global::Generator.Generator>([input], stages);
+        (ImmutableArray<Diagnostic> diagnostics, var output) = await GetGeneratedTrees<Generator.Generator>([input], stages);
 
         await Assert.That(diagnostics.Length).IsEqualTo(0);
         await Assert.That(output.Length).IsGreaterThan(0);
@@ -34,7 +34,7 @@ public class CachingTests
             .Concat([MetadataReference.CreateFromFile(typeof(T).Assembly.Location)]);
 
         CSharpCompilation compilation = CSharpCompilation.Create(
-            "Generator.FunctionalTests",
+            "GeneratorTests",
             syntaxTrees,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));

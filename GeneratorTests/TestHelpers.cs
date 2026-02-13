@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Assembly = System.Reflection.Assembly;
 
-namespace Generator.FunctionalTests;
+namespace GeneratorTests;
 
 internal static class TestHelpers
 {
@@ -27,12 +27,12 @@ internal static class TestHelpers
             .Select(a => MetadataReference.CreateFromFile(a.Location));
 
         CSharpCompilation compilation = CSharpCompilation.Create(
-            assemblyName: "Generator.FunctionalTests",
+            assemblyName: "GeneratorTests",
             syntaxTrees: [syntaxTree],
             references: references,
             options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-        global::Generator.Generator generator = new();
+        Generator.Generator generator = new();
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 

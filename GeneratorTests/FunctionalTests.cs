@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using TUnit.Core.Helpers;
 
-namespace Generator.FunctionalTests;
+namespace GeneratorTests;
 
 public class FunctionalTests
 {
@@ -93,8 +93,8 @@ public class FunctionalTests
     [Test]
     public async Task TwoBuildersAreGenerated_When_TwoBuildersWithTheSameNameExistInDifferentNamespaces()
     {
-        const string builder1TypeName = "Generator.FunctionalTests.TestData.Legacy.TestEntityBuilder";
-        const string builder2TypeName = "Generator.FunctionalTests.TestData.TestEntityBuilder";
+        const string builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
+        const string builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
         
         Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(TestConstants.Example2)!;
         var source = SourceText.From(mrs).ToString();
@@ -128,7 +128,7 @@ public class FunctionalTests
     [Test]
     public async Task IntendedMethodsAreGenerated()
     {
-        const string builderTypeName = "Generator.FunctionalTests.TestData.EntityBuilder";
+        const string builderTypeName = "GeneratorTests.TestData.EntityBuilder";
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
         var testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
@@ -142,7 +142,7 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        var testBuilder = compiledAssembly.CreateInstance("Generator.FunctionalTests.TestData.EntityBuilder");
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
             .GetMethods(BindingFlags.Public | BindingFlags.Instance)
@@ -161,10 +161,10 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        var testBuilder = compiledAssembly.CreateInstance("Generator.FunctionalTests.TestData.EntityBuilder");
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
         Type? entity2Type = testBuilder!.GetType().Assembly
-            .GetType("Generator.FunctionalTests.TestData.Entity2");
+            .GetType("GeneratorTests.TestData.Entity2");
         
         Type listType = typeof(List<>).MakeGenericType(entity2Type!);
         var countriesList = Activator.CreateInstance(listType)!;
@@ -210,7 +210,7 @@ public class FunctionalTests
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
         (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
-        var testBuilder = compiledAssembly.CreateInstance("Generator.FunctionalTests.TestData.EntityBuilder");
+        var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()

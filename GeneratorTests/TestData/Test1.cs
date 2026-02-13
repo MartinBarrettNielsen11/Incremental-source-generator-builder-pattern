@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Generator;
 
-namespace Generator.FunctionalTests.TestData;
+namespace GeneratorTests.TestData;
 
 public abstract class Base
 {

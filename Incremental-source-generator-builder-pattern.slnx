@@ -14,6 +14,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="Generator.Benchmarks/Generator.Benchmarks.csproj" />
-    <Project Path="Generator.FunctionalTests/Generator.FunctionalTests.csproj" />
+    <Project Path="GeneratorTests/GeneratorTests.csproj" />
   </Folder>
 </Solution>

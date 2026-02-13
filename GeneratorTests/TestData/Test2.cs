@@ -1,6 +1,6 @@
 using Generator;
 
-namespace Generator.FunctionalTests.TestData.Legacy
+namespace GeneratorTests.TestData.Legacy
 {
     public class TestEntity
     {

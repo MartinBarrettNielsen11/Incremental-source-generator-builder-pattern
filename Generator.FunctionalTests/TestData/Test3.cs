@@ -1,6 +1,6 @@
 using Generator;
 
-namespace GeneratorTests.TestData;
+namespace Generator.FunctionalTests.TestData;
 
 public partial class Country
 {

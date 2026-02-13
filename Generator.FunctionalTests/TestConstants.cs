@@ -1,4 +1,4 @@
-namespace GeneratorTests;
+namespace Generator.FunctionalTests;
 
 internal static class TestConstants
 {

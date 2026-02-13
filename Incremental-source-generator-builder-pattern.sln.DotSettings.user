@@ -8,12 +8,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003ASyntaxValueProvider_005FForAttributeWithMetadataName_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003F6462af285f9aa48f7d1e6c38a545f90bd8455486d13fe3bc0d35bf62b799ccf_003FSyntaxValueProvider_005FForAttributeWithMetadataName_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AUserFunction_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2025_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fbc8216fca628cbee3a6ba7f3f0adb3508b4198874f25d28bdb5ff66ab5d53f8_003FUserFunction_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=e931d418_002D1c76_002D4ee5_002D9a9e_002Dde98a9a57fcd/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="NoDiagnosticsAreReported" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;Or&gt;
-    &lt;TestAncestor&gt;
-      &lt;TestId&gt;Testing Platform::D02281F7-C248-8EB5-85AF-E5F5937FEA95::net10.0::GeneratorTests.FunctionalTests&lt;/TestId&gt;
-    &lt;/TestAncestor&gt;
-    &lt;ProjectFile&gt;D02281F7-C248-8EB5-85AF-E5F5937FEA95/f:CachingTests.cs&lt;/ProjectFile&gt;
-  &lt;/Or&gt;
+  &lt;Project Location="/Users/martinnielsen/Desktop/notes/projects/other/source-generators/Incremental-source-generator-builder-pattern" Presentation="&amp;lt;tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	
 	

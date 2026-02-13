@@ -1,6 +1,4 @@
-using Generator;
-
-namespace GeneratorTests;
+namespace Generator.FunctionalTests;
 
 public class EquatableArrayTests
 {

@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="GeneratorTests" />
+        <InternalsVisibleTo Include="Generator.FunctionalTests" />
         <InternalsVisibleTo Include="Generator.Benchmarks"/>
     </ItemGroup>
     

@@ -2,7 +2,7 @@
 
 ## Introduction
 The BuilderGenerator is a Roslyn powered incremental source generator.
-Its purpose is to automate the generation of object builders for testing - using a fluent syntax
+Its purpose is to automate the generation of object builders for testing - using a fluent syntax.
 It generates the repetitive part of creating builders, leaving only the more interesting, hand-curated parts for you to implement as partial classes.
 
 An example usage for a domain entity can be seen in the following:
@@ -222,3 +222,8 @@ Upon also persisting said builders in the database as the final step of the test
 
 ## Troubleshooting
 Sometimes the code completion in Visual Studio gets confused and will wrongly either indicate With-methods as missing and not performing code completion correctly.  If you encounter this, try to clean your solution and perform a rebuild and further more restart your Visual Studio.
+
+
+## Design Decisions
+
+For architectural reasoning and tradeoffs, see [Design Decisions](./DesignDecisions.md).

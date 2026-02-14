@@ -1,7 +1,7 @@
 <Solution>
   <Folder Name="/docs/">
-    <File Path="DesignDecisions.md" />
-    <File Path="ReadMe.md" />
+    <File Path="docs/DesignDecisions.md" />
+    <File Path="docs/ReadMe.md" />
   </Folder>
   <Folder Name="/sample/">
     <Project Path="Generator.Demo/Generator.Demo.csproj" />

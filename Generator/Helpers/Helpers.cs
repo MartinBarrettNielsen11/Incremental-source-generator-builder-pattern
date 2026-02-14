@@ -68,4 +68,33 @@ internal static class Helpers
             HasSetter: property.SetMethod is not null,
             Accessibility: property.DeclaredAccessibility
         );
+    
+    internal static int EstimateInitialCapacity(in BuilderToGenerate builder)
+    {
+        const int header = 300;
+        const int footer = 100;
+        const double padding = 1.05;
+
+        List<PropertyInfoModel> allProps = builder.Properties.AllProperties;
+        var collectionCount = builder.Properties.Collection.Count;
+
+        // Compute averages
+        var totalNameLen = 0;
+        var totalTypeLen = 0;
+
+        foreach (PropertyInfoModel p in allProps)
+        {
+            totalNameLen += p.Name.Length;
+            totalTypeLen += p.TypeName.Length;
+        }
+
+        var avgNameLen = allProps.Count > 0 ? totalNameLen / allProps.Count : 0;
+        var avgTypeLen = allProps.Count > 0 ? totalTypeLen / allProps.Count : 0;
+
+        var perPropertyCost = 310 + avgNameLen + avgTypeLen;
+
+        var total = header + allProps.Count * perPropertyCost + collectionCount * 150 + footer;
+
+        return (int)(total * padding);
+    }
 }

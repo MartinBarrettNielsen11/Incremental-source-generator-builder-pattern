@@ -2,7 +2,7 @@ namespace Generator;
 
 internal static class BuilderSourceWriter
 {
-    internal static string GenerateBuilderAttribute(string builderAttributeName) =>
+    internal static string WriteBuilderAttribute(string builderAttributeName) =>
         $$$"""
            #nullable enable
            #pragma warning disable CA1813, CA1019, IDE0065, IDE0034, IDE0055
@@ -21,7 +21,7 @@ internal static class BuilderSourceWriter
            #pragma warning restore CA1813, CA1019, IDE0065, IDE0034, IDE0055
            """;
 
-    internal static string GenerateDomainAssertionExtensions(string builderProduct) =>
+    internal static string WriteDomainAssertionExtensions(string builderProduct) =>
         $$$"""
            #pragma warning disable IDE0055, IDE0008
            #nullable enable
@@ -56,9 +56,9 @@ internal static class BuilderSourceWriter
            #pragma warning restore IDE0055, IDE0008
            """;
 
-    internal static string GenerateBuilder(in BuilderToGenerate builder)
+    internal static string WriteBuilder(in BuilderToGenerate builder)
     {
-        var estimated = EstimateInitialCapacity(builder);
+        var estimated = Helpers.EstimateInitialCapacity(builder);
 
         const int conservativeStackLimit = 2048;
 
@@ -68,18 +68,17 @@ internal static class BuilderSourceWriter
 
         ValueStringBuilder vsb = new ValueStringBuilder(initial);
 
-        GenerateHeader(ref vsb, builder);
-        GenerateFields(ref vsb, builder);
-        GenerateWithMethods(ref vsb, builder);
-        GenerateBuildMethod(ref vsb, builder);
-        GenerateFooter(ref vsb);
+        WriteHeader(ref vsb, builder);
+        WriteFields(ref vsb, builder);
+        WriteWithMethods(ref vsb, builder);
+        WriteBuildMethod(ref vsb, builder);
+        WriteFooter(ref vsb);
 
         return vsb.ToString();
-
     }
     
 
-    private static void GenerateHeader(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void WriteHeader(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         vsb.Append(
             $$$"""
@@ -100,7 +99,7 @@ internal static class BuilderSourceWriter
                """.AsSpan());
     }
 
-    private static void GenerateFields(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void WriteFields(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         vsb.Append($""" 
                          private Func<{builder.TargetClassFullName}> {Constants.FactoryName} = () => new();   
@@ -116,7 +115,7 @@ internal static class BuilderSourceWriter
         }
     }
 
-    private static void GenerateWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void WriteWithMethods(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         foreach (PropertyInfoModel prop in builder.Properties.AllProperties)
         {
@@ -141,7 +140,7 @@ internal static class BuilderSourceWriter
         }
     }
 
-    private static void GenerateBuildMethod(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
+    private static void WriteBuildMethod(ref ValueStringBuilder vsb, in BuilderToGenerate builder)
     {
         vsb.Append(
             $$"""
@@ -194,40 +193,11 @@ internal static class BuilderSourceWriter
                """.AsSpan());
     }
 
-    private static void GenerateFooter(ref ValueStringBuilder vsb) =>
+    private static void WriteFooter(ref ValueStringBuilder vsb) =>
         vsb.Append(
             $$"""
                }
                
                #pragma warning restore IDE0055, IDE0008
                """.AsSpan());
-    
-    private static int EstimateInitialCapacity(in BuilderToGenerate builder)
-    {
-        const int header = 300;
-        const int footer = 100;
-        const double padding = 1.05;
-
-        List<PropertyInfoModel> allProps = builder.Properties.AllProperties;
-        var collectionCount = builder.Properties.Collection.Count;
-
-        // Compute averages
-        var totalNameLen = 0;
-        var totalTypeLen = 0;
-
-        foreach (PropertyInfoModel p in allProps)
-        {
-            totalNameLen += p.Name.Length;
-            totalTypeLen += p.TypeName.Length;
-        }
-
-        var avgNameLen = allProps.Count > 0 ? totalNameLen / allProps.Count : 0;
-        var avgTypeLen = allProps.Count > 0 ? totalTypeLen / allProps.Count : 0;
-
-        var perPropertyCost = 310 + avgNameLen + avgTypeLen;
-
-        var total = header + allProps.Count * perPropertyCost + collectionCount * 150 + footer;
-
-        return (int)(total * padding);
-    }
 }

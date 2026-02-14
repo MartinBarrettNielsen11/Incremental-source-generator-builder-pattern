@@ -7,7 +7,7 @@
     <Project Path="Generator.Demo/Generator.Demo.csproj" />
   </Folder>
   <Folder Name="/solution-items/">
-    <File Path=".editorconfig" />
+    <File Path="solution-items/.editorconfig" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="Generator/Generator.csproj" />

@@ -15,13 +15,13 @@ internal sealed class Generator : IIncrementalGenerator
             context.AddSource(
                 hintName: $"{Constants.BuilderAttributeName}{Constants.GeneratedFileSuffix}", 
                 sourceText: SourceText.From(
-                    BuilderSourceWriter.GenerateBuilderAttribute(Constants.BuilderAttributeName), 
+                    BuilderSourceWriter.WriteBuilderAttribute(Constants.BuilderAttributeName), 
                     Encoding.UTF8));
 
             context.AddSource(
                 hintName: $"{Constants.DomainAssertionExtensions}{Constants.GeneratedFileSuffix}", 
                 sourceText: SourceText.From(
-                    BuilderSourceWriter.GenerateDomainAssertionExtensions(typeof(Generator).Namespace!), 
+                    BuilderSourceWriter.WriteDomainAssertionExtensions(typeof(Generator).Namespace!), 
                     Encoding.UTF8));
         });
         
@@ -42,7 +42,7 @@ internal sealed class Generator : IIncrementalGenerator
         {
             try
             {
-                var generatedOutput = BuilderSourceWriter.GenerateBuilder(builder);
+                var generatedOutput = BuilderSourceWriter.WriteBuilder(builder);
 
                 // move extensions addition down here - and make tests for it
                 sourceProductionContext.AddSource(

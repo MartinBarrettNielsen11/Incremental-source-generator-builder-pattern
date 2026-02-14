@@ -18,9 +18,9 @@ internal static class TestHelpers
     }
     
     internal static async Task<(GeneratorDriverRunResult runResult, Assembly compiledAssembly)>
-        ParseAndDriveResult(string source)
+        ParseAndDriveResult(string source, CancellationToken ct)
     {
-        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source);
+        SyntaxTree syntaxTree = CSharpSyntaxTree.ParseText(source, cancellationToken: ct);
         
         IEnumerable<PortableExecutableReference> references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
@@ -36,16 +36,16 @@ internal static class TestHelpers
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create(generator);
 
-        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, out Compilation outputCompilation,
-            out ImmutableArray<Diagnostic> diagnostics);
-
-        // Load assembly into memory
+        driver = driver.RunGeneratorsAndUpdateCompilation(compilation, 
+                                                          out Compilation outputCompilation,
+                                                          out ImmutableArray<Diagnostic> diagnostics,
+                                                          cancellationToken: ct);
+        
         using MemoryStream ms = new MemoryStream();
-        EmitResult emitResult = outputCompilation.Emit(ms);
+        EmitResult emitResult = outputCompilation.Emit(ms, cancellationToken: ct);
+        await Assert.That(diagnostics).IsEmpty();
 
         await Assert.That(emitResult.Success).IsTrue();
-        var somethingToBeAsserted = string.Join("\n", emitResult.Diagnostics);
-        // also assert on "diagnostics" variable
 
         ms.Seek(0, SeekOrigin.Begin);
         Assembly compiledAssembly = Assembly.Load(ms.ToArray());
@@ -68,7 +68,6 @@ internal static class TestHelpers
 
         GeneratorDriver driver = CSharpGeneratorDriver.Create([generator], driverOptions: opts);
 
-        // Create a clone of the compilation that we will use later
         CSharpCompilation clone = compilation.Clone();
 
         // Do the initial run
@@ -112,7 +111,7 @@ internal static class TestHelpers
         foreach (var (trackingName, runSteps1) in trackedSteps1)
         {
             ImmutableArray<IncrementalGeneratorRunStep> runSteps2 = trackedSteps2[trackingName];
-            await AssertRunsEqual(runSteps1, runSteps2, trackingName);
+            await AssertRunsEqual(runSteps1, runSteps2);
         }
     }
     
@@ -125,8 +124,7 @@ internal static class TestHelpers
     
     private static async Task AssertRunsEqual(
         ImmutableArray<IncrementalGeneratorRunStep> runSteps1,
-        ImmutableArray<IncrementalGeneratorRunStep> runSteps2,
-        string stepName)
+        ImmutableArray<IncrementalGeneratorRunStep> runSteps2)
     {
         await Assert.That(runSteps1.Length).IsEqualTo(runSteps2.Length);
 
@@ -140,15 +138,14 @@ internal static class TestHelpers
                 .All(x => x.Reason is IncrementalStepRunReason.Cached or IncrementalStepRunReason.Unchanged);
 
             // make sure we are not using anything we shouldn't 
-            await AssertObjectGraph(runStep1, stepName);
+            await AssertObjectGraph(runStep1);
         }
     }
     
-    private static async Task AssertObjectGraph(IncrementalGeneratorRunStep runStep, string stepName)
+    private static async Task AssertObjectGraph(IncrementalGeneratorRunStep runStep)
     {
         // Including the stepName in error messages to make it easy to isolate issues
-        var because = $"{stepName} shouldn't contain banned symbols";
-        HashSet<object> visited = new();
+        HashSet<object> visited = [];
 
         foreach (var (obj, _) in runStep.Outputs)
         {
@@ -170,9 +167,10 @@ internal static class TestHelpers
             if (type.IsPrimitive || type.IsEnum || type == typeof(string))
                 return;
 
-            // If the object is a collection, check each of the values
-            if (node is IEnumerable collection and not string)
+            var isEnumerableNode = node is IEnumerable and not string;
+            if (isEnumerableNode)
             {
+                var collection = (IEnumerable)node;            
                 foreach (var element in collection)
                 {
                     // Recursively check each element in the collection
@@ -183,8 +181,11 @@ internal static class TestHelpers
             }
 
             //Recursively check each field in the object 
-            foreach (FieldInfo f in
-                     type.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance))
+            FieldInfo[] instanceFields = type.GetFields(BindingFlags.Public | 
+                                                        BindingFlags.NonPublic | 
+                                                        BindingFlags.Instance);
+            
+            foreach (FieldInfo f in instanceFields)
             {
                 var fieldValue = f.GetValue(node)!;
                 await Visit(fieldValue);

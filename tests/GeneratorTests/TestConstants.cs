@@ -6,4 +6,6 @@ internal static class TestConstants
     internal static readonly string Example1 = $"{typeof(TestConstants).Namespace}.TestData.Test1.cs";
     internal static readonly string Example2 = $"{typeof(TestConstants).Namespace}.TestData.Test2.cs";
     internal static readonly string Example3 = $"{typeof(TestConstants).Namespace}.TestData.Test3.cs";
+    internal const string ExpectedDomainExtensionHintName = "DomainAssertionExtensions.g.cs";
+    
 }

@@ -8,13 +8,13 @@ namespace GeneratorTests;
 
 public class FunctionalTests
 {
-    private VerifySettings _settings = new();
+    private readonly VerifySettings _settings = new();
     
     [Test]
-    public async Task BuilderAttributeUsageIsGenerated()
+    public async Task BuilderAttributeUsageIsGenerated(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
 
         var generatedBuilderForAttribute = generatorRunResult.GeneratedSources
@@ -25,25 +25,25 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task DomainAssertionExtensionsIsGenerated()
+    public async Task DomainAssertionExtensionsIsGenerated(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
 
         var generatedBuilderForAttribute = generatorRunResult.GeneratedSources
-            .Single(gs => gs.HintName == "DomainAssertionExtensions.g.cs").SourceText.ToString();
+            .Single(gs => gs.HintName == TestConstants.ExpectedDomainExtensionHintName).SourceText
+            .ToString();
         
         _settings.UseDirectory(TestConstants.VerifyDirectory);
         await Verify(generatedBuilderForAttribute, _settings);
     }
     
-    
     [Test]
-    public async Task BuilderClassIsGenerated()
+    public async Task BuilderClassIsGenerated(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         var generatedBuilderClass = generatorRunResult.GeneratedSources
             .Single(gs => gs.HintName == "GeneratorTests_TestData_EntityBuilder.g.cs")
@@ -53,32 +53,29 @@ public class FunctionalTests
         await Verify(generatedBuilderClass, _settings);
     }
     
-    
     [Test]
-    public async Task NoDiagnosticsAreReported()
+    public async Task NoDiagnosticsAreReported(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         ImmutableArray<Diagnostic> diagnostics = runResult.Diagnostics;
         await Assert.That(diagnostics.Length).IsEqualTo(0);
     }
     
-        
     [Test]
-    public async Task OnlyOneBuilderIsGenerated_When_EntityHasPartialKeyword()
+    public async Task OnlyOneBuilderIsGenerated_When_EntityHasPartialKeyword(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(3);
     }
     
-    
     [Test]
-    public async Task When_DomainEntityHasPartialKeyword_Then_BuilderClassIsGenerated()
+    public async Task When_DomainEntityHasPartialKeyword_Then_BuilderClassIsGenerated(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example3);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         GeneratorRunResult generatorRunResult = runResult.Results[0];
         
         var generatedBuilderClass = generatorRunResult.GeneratedSources
@@ -89,16 +86,15 @@ public class FunctionalTests
         await Verify(generatedBuilderClass, _settings);
     }
     
-    
     [Test]
-    public async Task TwoBuildersAreGenerated_When_TwoBuildersWithTheSameNameExistInDifferentNamespaces()
+    public async Task TwoBuildersAreGenerated_When_TwoBuildersWithTheSameNameExistInDifferentNamespaces(CancellationToken ct)
     {
         const string builder1TypeName = "GeneratorTests.TestData.Legacy.TestEntityBuilder";
         const string builder2TypeName = "GeneratorTests.TestData.TestEntityBuilder";
         
         Stream mrs = typeof(FunctionalTests).Assembly.GetManifestResourceStream(TestConstants.Example2)!;
         var source = SourceText.From(mrs).ToString();
-        (GeneratorDriverRunResult runResult, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(source);
+        (GeneratorDriverRunResult runResult, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(source, ct);
         
         await Assert.That(runResult.GeneratedTrees.Length).IsEqualTo(4);
         
@@ -117,20 +113,20 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task OneAttributeForFileIsGenerated_When_GeneratingTwoBuilders()
+    public async Task OneAttributeForFileIsGenerated_When_GeneratingTwoBuilders(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example2);
-        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText);
+        var (runResult, _) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         ImmutableArray<SyntaxTree> syntaxTrees = runResult.GeneratedTrees;
         await Assert.That(syntaxTrees.Length).IsEqualTo(4);
     }
     
     [Test]
-    public async Task IntendedMethodsAreGenerated()
+    public async Task IntendedMethodsAreGenerated(CancellationToken ct)
     {
         const string builderTypeName = "GeneratorTests.TestData.EntityBuilder";
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         var testBuilder = compiledAssembly.CreateInstance(builderTypeName); 
         MethodInfo[] methods = testBuilder!.GetType().GetMethods(BindingFlags.Public | BindingFlags.Instance);
         _settings.UseDirectory(TestConstants.VerifyDirectory);
@@ -138,10 +134,10 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task NewValueIsSet_When_InvokingWithMethod()
+    public async Task NewValueIsSet_When_InvokingWithMethod(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         MethodInfo directGeneratedWithMethod = testBuilder!
             .GetType()
@@ -154,13 +150,12 @@ public class FunctionalTests
         var res = directGeneratedWithMethod!.Invoke(testBuilder, [ newName ]);
         await Assert.That(testBuilder).IsEqualTo(res);
     }
-
     
     [Test]
-    public async Task EntityIsConstructed_When_InvokingBuildMethod()
+    public async Task EntityIsConstructed_When_InvokingBuildMethod(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
 
         Type? entity2Type = testBuilder!.GetType().Assembly
@@ -206,10 +201,10 @@ public class FunctionalTests
     }
     
     [Test]
-    public async Task EntityCannotBeBuilt_When_InvokingWithMethodConflictsWithDomainRule()
+    public async Task EntityCannotBeBuilt_When_InvokingWithMethodConflictsWithDomainRule(CancellationToken ct)
     {
         var sourceText = await TestHelpers.GetSourceText(TestConstants.Example1);
-        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText);
+        (_, Assembly compiledAssembly) = await TestHelpers.ParseAndDriveResult(sourceText, ct);
         var testBuilder = compiledAssembly.CreateInstance("GeneratorTests.TestData.EntityBuilder");
         
         MethodInfo directGeneratedWithMethod = testBuilder!

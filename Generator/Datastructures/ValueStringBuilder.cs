@@ -2,6 +2,17 @@ using System.Runtime.CompilerServices;
 
 namespace Generator;
 
+/// <summary>
+/// A lightweight, stack-friendly string builder that minimizes heap allocations
+/// by operating over a <see cref="Span{T}"/> buffer.
+/// </summary>
+/// <remarks>
+/// <para>
+/// <c>ValueStringBuilder</c> is a <c>ref struct</c> designed for high-performance
+/// scenarios where small, short-lived strings are constructed. It can be initialized
+/// with a stack-allocated buffer (via <c>stackalloc</c>) to avoid heap allocations.
+/// </para>
+/// </remarks>
 internal ref struct ValueStringBuilder(Span<char> initialBuffer)
 {
     private char[]? _arrayToReturnToPool = null;

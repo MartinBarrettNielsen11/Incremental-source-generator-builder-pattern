@@ -13,7 +13,7 @@
     <Project Path="Generator/Generator.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="Generator.Benchmarks/Generator.Benchmarks.csproj" />
-    <Project Path="GeneratorTests/GeneratorTests.csproj" />
+    <Project Path="tests/Generator.Benchmarks/Generator.Benchmarks.csproj" />
+    <Project Path="tests/GeneratorTests/GeneratorTests.csproj" />
   </Folder>
 </Solution>

@@ -8,7 +8,7 @@ It generates the repetitive part of creating builders, leaving only the more int
 An example usage for a domain entity can be seen in the following:
 
 ```csharp
-var site = buildingBuilder
+var site = siteBuilder
                 .WithName("building1")
                 .WithCreatedAt("2025-12-24")
                 .WithRevision(2)
@@ -158,23 +158,25 @@ The proceeding subsections will paint a picture of how the builders can be set u
 
 A common and recommended pattern is to define a small hierarchy of static factory methods on each builder. These methods represent specific domain scenarios and serve as stable, intentional starting points for tests.
 
-For example, a `SiteBuilder` might define the following:
+For example, a `SiteBuilder` might define the following factory methods:
 
-- **Minimal**
-  - Produces the smallest possible instance that satisfies all invariants and can be persisted.
-  - Serves as the foundation for all other factory methods.
-  - When a new required field is added to the domain model, updating this method is often sufficient to fix most tests.
+#### Minimal
+- Produces the smallest possible instance that satisfies all invariants and can be persisted.
+- Serves as the foundation for all other factory methods.
+- When a new required field is added to the domain model, updating this method is often sufficient to fix most tests.
 
-- **Typical**
-  - Represents a realistic, commonly used configuration of the entity.
-  - Builds on `Minimal` and fills in additional relationships or values.
-  - Intended to reflect how the entity is most often encountered in real scenarios.
+#### Typical
+- Represents a realistic, commonly used configuration of the entity.
+- Builds on `Minimal` and fills in additional relationships or values.
+- Intended to reflect how the entity is most often encountered in real scenarios.
 
-- **Scenario-specific factories**
-  - Additional factory methods (e.g. `AdminSite`) may be introduced when a particular configuration appears repeatedly across tests.
-  - These methods encode recurring test scenarios directly into the builder, reducing duplication and improving clarity.
+#### Scenario-specific factories
+- Additional factory methods (e.g. `AdminSite`) may be introduced when a particular configuration appears repeatedly across tests.
+- These methods encode recurring test scenarios directly into the builder, reducing duplication and improving clarity.
 
-By centralizing common configurations in such a manner this pattern, ad hoc object creation in individual tests is avoided, and test code remains consistent and maintainable as the domain evolves. An example for the `SiteBuilder` can be seen in the following:
+By centralizing common configurations with such a pattern, ad hoc object creation in individual tests is avoided, and test code remains consistent and maintainable as the domain evolves.
+
+An example for the `SiteBuilder` can be seen in the following:
 
 ```csharp
 [Builder(typeof(Site))]
@@ -193,9 +195,9 @@ internal partial class SiteBuilder
 }
 ```
 
-### Domain validation rules
+### Domain Validation Rules
 
-Builders may also define **domain validation rules** that are executed automatically during the `Build()` phase.
+Builders may also define **domain validation rules** that are executed automatically during the `Build()` phase in the client code.
 
 These rules can be stated in the builder’s constructor and express invariants that must hold for the constructed entity. If a rule is violated, the build process fails immediately with a clear error message.
 
@@ -226,4 +228,4 @@ Sometimes the code completion in Visual Studio gets confused and will wrongly ei
 
 ## Design Decisions
 
-For architectural reasoning and tradeoffs, see [Design Decisions](./DesignDecisions.md).
+For architectural reasoning and trade-offs, see [Design Decisions](./DesignDecisions.md).

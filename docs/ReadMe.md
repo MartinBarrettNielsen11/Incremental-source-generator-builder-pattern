@@ -8,7 +8,7 @@ It generates the repetitive part of creating builders, leaving only the more int
 An example usage for a domain entity can be seen in the following:
 
 ```csharp
-var site = siteBuilder
+var site = new SiteBuilder()
                 .WithName("building1")
                 .WithCreatedAt("2025-12-24")
                 .WithRevision(2)
@@ -36,7 +36,7 @@ using Generator;
 using Domain.Site;
 
 [BuilderFor(typeof(Site))]
-public partial class SiteBuilder { }
+internal sealed partial class SiteBuilder { }
 ```
 And now you have all the code necessary for using your builders.
 
@@ -180,7 +180,7 @@ An example for the `SiteBuilder` can be seen in the following:
 
 ```csharp
 [Builder(typeof(Site))]
-internal partial class SiteBuilder
+internal sealed partial class SiteBuilder
 {
     public static SiteBuilder Minimal() => new SiteBuilder()
         .WithCreatedAt(DateTime.Now)
@@ -205,7 +205,7 @@ An example of enforcement of such a constraint for the `SiteBuilder` is shown be
 
 ```csharp
 [Builder(typeof(Site))]
-internal partial class SiteBuilder
+internal sealed partial class SiteBuilder
 {
     private SiteBuilder()
     {

@@ -1,4 +1,5 @@
-# BuilderGenerator
+# BuilderGenerator [![NuGet Package](https://img.shields.io/nuget/v/Scrutor.svg)](https://www.nuget.org/packages/IncrementalSourceGenerator.BuilderPattern)
+
 
 ## Introduction
 The BuilderGenerator is a Roslyn powered incremental source generator.

@@ -8,15 +8,39 @@
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <RootNamespace>Generator</RootNamespace>
+        <NoPackageAnalysis>true</NoPackageAnalysis>
+        <PackageId>IncrementalSourceGenerator.BuilderPattern</PackageId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>ReadMe.md</PackageReadmeFile>
+        <Version>1.0.2</Version>
+        <Authors>Martin Barrett Nielsen</Authors>
+        <Description>
+            Incremental source generator that that reduces boilerplate in test object builders 
+            by generating the repetitive structure, while enabling developers to focus on the 
+            more meaningful, hand-crafted logic via partial classes
+        </Description>
+        <PackageTags>incremental-source-generator; roslyn</PackageTags>
+        <RepositoryUrl>
+            https://github.com/MartinBarrettNielsen11/Incremental-source-generator-builder-pattern
+        </RepositoryUrl>
+        <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn)</GenerateNuspecDependsOn>
+        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
-
+    
     <ItemGroup>
+        <None Include="..\docs\ReadMe.md"
+              Pack="true"
+              PackagePath=""
+              Link="ReadMe.md" />
         <PackageReference Include="Microsoft.CodeAnalysis" Version="4.12.0" />
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.12.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0">
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.11.0" >
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <!-- Package the generator in the analyzer directory of the nuget package -->
+        <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,13 +1,6 @@
 <Solution>
-  <Folder Name="/docs/">
-    <File Path="docs/DesignDecisions.md" />
-    <File Path="docs/ReadMe.md" />
-  </Folder>
   <Folder Name="/sample/">
     <Project Path="Generator.Demo/Generator.Demo.csproj" />
-  </Folder>
-  <Folder Name="/solution-items/">
-    <File Path="solution-items/.editorconfig" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="Generator/Generator.csproj" />
@@ -15,5 +8,12 @@
   <Folder Name="/tests/">
     <Project Path="tests/Generator.Benchmarks/Generator.Benchmarks.csproj" />
     <Project Path="tests/GeneratorTests/GeneratorTests.csproj" />
+  </Folder>
+  <Folder Name="/_docs/">
+    <File Path="docs/DesignDecisions.md" />
+    <File Path="docs/ReadMe.md" />
+  </Folder>
+  <Folder Name="/_solution-items/">
+    <File Path="solution-items/.editorconfig" />
   </Folder>
 </Solution>

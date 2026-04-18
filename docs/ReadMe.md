@@ -1,4 +1,4 @@
-  BuilderGenerator [![NuGet Package](https://img.shields.io/nuget/v/IncrementalSourceGenerator.BuilderPattern.svg)](https://www.nuget.org/packages/IncrementalSourceGenerator.BuilderPattern)
+# BuilderGenerator [![NuGet Package](https://img.shields.io/nuget/v/IncrementalSourceGenerator.BuilderPattern.svg)](https://www.nuget.org/packages/IncrementalSourceGenerator.BuilderPattern)
 
 
 ## Introduction
@@ -17,11 +17,9 @@ var site = new SiteBuilder()
 ```
 
 ## Installation
-Add the following project reference in consuming project:
-```xml
-<ProjectReference Include="..\Incremental-source-generator-builder-pattern\Generator.csproj"
-                  OutputItemType = "Analyzer"
-                  ReferenceOutputAssembly="false"/>
+Add NuGet package reference:
+```bash
+dotnet add package IncrementalSourceGenerator.BuilderPattern
 ```
 
 
@@ -225,6 +223,11 @@ Upon also persisting said builders in the database as the final step of the test
 
 ## Troubleshooting
 Sometimes the code completion in Visual Studio gets confused and will wrongly either indicate With-methods as missing and not performing code completion correctly.  If you encounter this, try to clean your solution and perform a rebuild and further more restart your Visual Studio.
+
+
+## Limitations
+The generator supports anemic domain models and does not support DDD entities. 
+The reason behind this is that the generated code is partially based on the public setters of the individual properties.
 
 
 ## Design Decisions

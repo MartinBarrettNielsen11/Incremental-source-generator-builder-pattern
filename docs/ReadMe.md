@@ -29,10 +29,10 @@ In the *Builders* folder, add a builder for the given entity.
 This is just a public partial class decorated with a *Builder* attribute that describes for which entity the builder should be created:
 
 ```csharp
-namespace Generator.Tests.Data.Builders;
-
 using Generator;
 using Domain.Site;
+
+namespace Generator.Tests.Data.Builders;
 
 [BuilderFor(typeof(Site))]
 internal sealed partial class SiteBuilder { }
